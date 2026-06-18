@@ -20,14 +20,14 @@ Copie para o seu projeto e comece:
 cp -r workflow/ .claude/ CLAUDE.md ~/seu-projeto/
 cd ~/seu-projeto
 # abra o Claude Code e rode:
-/init
+/initialize
 ```
 
 ## Agentes
 
 | Agente | Invocação | Descrição |
 |--------|-----------|-----------|
-| `init` | `/init` | Entrevista você para definir o projeto → `workflow/definition.md` |
+| `initialize` | `/initialize` | Entrevista você para definir o projeto → `workflow/definition.md` |
 | `spec-creator` | `/spec-creator <brief>` | Cria uma spec de task, pode fazer perguntas |
 | `spec-creator-auto` | `/spec-creator-auto <brief>` | Cria uma spec de task sem perguntar nada |
 | `implementer` | `/implementer <task>` | Implementa uma task, sem commits |
@@ -39,7 +39,7 @@ cd ~/seu-projeto
 
 ```bash
 # 1. Definir o projeto (uma vez)
-/init
+/initialize
 
 # 2. Criar uma task
 /spec-creator adicionar login com email e senha

@@ -6,7 +6,7 @@ This project uses a structured AI-assisted development workflow. Tasks move thro
 
 ```
 workflow/
-  definition.md          # Project definition (created by init agent)
+  definition.md          # Project definition (created by initialize agent)
   tasks/
     todo/                # Ready to implement
     in-progress/         # Currently being worked on
@@ -20,7 +20,7 @@ workflow/
 
 | Agent | Invocation | Description |
 |-------|-----------|-------------|
-| `init` | `/init` | Interactive project setup — creates `workflow/definition.md` |
+| `initialize` | `/initialize` | Interactive project setup — creates `workflow/definition.md` |
 | `spec-creator` | `/spec-creator <brief>` | Creates a task spec, may ask questions |
 | `spec-creator-auto` | `/spec-creator-auto <brief>` | Creates a task spec autonomously |
 | `implementer` | `/implementer <task-path>` | Implements a task, no commits |
@@ -32,7 +32,7 @@ workflow/
 
 ### Starting a project
 ```
-/init
+/initialize
 ```
 Walks through an interview to define the project. Creates `workflow/definition.md`.
 

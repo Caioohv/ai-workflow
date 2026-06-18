@@ -1,5 +1,5 @@
 ---
-name: init
+name: initialize
 description: Interactive project initialization agent. Interviews the user to fully define the project — goals, users, tech stack, architecture, conventions — then creates workflow/definition.md.
 ---
 

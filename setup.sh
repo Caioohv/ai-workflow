@@ -1,14 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TARGET="${1:-}"
+UPDATE=false
+ARGS=()
+for arg in "$@"; do
+  if [[ "$arg" == "--update" ]]; then
+    UPDATE=true
+  else
+    ARGS+=("$arg")
+  fi
+done
+
+TARGET="${ARGS[0]:-}"
 
 if [[ -z "$TARGET" ]]; then
-  echo "Uso: ./setup.sh <pasta-destino>"
+  echo "Uso: ./setup.sh <pasta-destino> [--update]"
   exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if $UPDATE; then
+  if [[ ! -d "$TARGET/.claude" ]]; then
+    echo "Erro: '$TARGET' não tem um workflow instalado. Rode sem --update para fazer o setup inicial."
+    exit 1
+  fi
+
+  rm -rf "$TARGET/.claude"
+  cp -r "$SCRIPT_DIR/.claude" "$TARGET/"
+  cp "$SCRIPT_DIR/CLAUDE.md" "$TARGET/"
+  cp -r "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/"
+
+  echo "Workflow atualizado em: $TARGET"
+  exit 0
+fi
 
 mkdir -p "$TARGET"
 

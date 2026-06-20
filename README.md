@@ -34,6 +34,19 @@ cd ~/seu-projeto
 | `implementer-ci` | `/implementer-ci <task>` | Implementa com Conventional Commits |
 | `implementer-auto` | `/implementer-auto` | Roda todas as tasks pendentes sem supervisão |
 | `reviewer` | `/reviewer <task>` | Aprova ou rejeita; cria tasks de follow-up na rejeição |
+| `design-system` | `/design-system` | Entrevista você para definir um design system (cores, fontes, espaçamentos) → `workflow/design.md` |
+
+## Skills
+
+Skills entram em ação automaticamente quando você mexe no código relacionado:
+
+| Skill | Quando aplica | O que faz |
+|-------|---------------|-----------|
+| `frontend-components` | Ao criar ou alterar UI/front | Prioriza componentes reaproveitáveis e segue os tokens de `workflow/design.md` — nada de cor/fonte/espaçamento hardcoded |
+| `api-responses` | Ao escrever respostas de endpoints (JS/Node) | Retornos human-friendly com formato consistente, sem vazar internals (stack trace, erro de banco, paths, segredos) |
+
+> Defina o design system com `/design-system` antes de construir o front — o skill
+> `frontend-components` lê `workflow/design.md` como fonte única de verdade.
 
 ## Fluxo típico
 

@@ -51,7 +51,9 @@ Write a concise summary of everything you understood and ask: *"Is this accurate
 
 ## Output
 
-Once confirmed, create `workflow/definition.md`:
+Once the user explicitly confirms the summary, you MUST create the file — this is the entire point of the agent. Use the Write tool to write `workflow/definition.md`, **overwriting the placeholder** that ships there by default. Do not skip this step, do not just print the content in chat, and do not wait for further permission after confirmation. After writing, print the absolute path so the user knows it was created.
+
+Write `workflow/definition.md` with this structure:
 
 ```markdown
 # Project Definition
@@ -109,9 +111,12 @@ Once confirmed, create `workflow/definition.md`:
 - [Risk/constraint and mitigation]
 ```
 
+Then make sure `workflow/project-memory.md` exists. If it is missing, create it with the standard header (a running log of "known gotchas"). If it already exists, leave it untouched.
+
 ## Rules
 
 - Always read the codebase before asking anything — never open with questions you could answer yourself.
 - Push back on vague answers: ask "can you give a concrete example?" or "walk me through a typical user flow."
 - Do not create the file until the user explicitly confirms the summary is correct.
+- Once confirmed, always write `workflow/definition.md` to disk with the Write tool — never leave it as the placeholder.
 - Keep conversations focused — no filler, no fluff.

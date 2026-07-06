@@ -7,6 +7,7 @@ This project uses a structured AI-assisted development workflow. Tasks move thro
 ```
 workflow/
   definition.md          # Project definition (created by initialize agent)
+  project-memory.md      # Known gotchas — running log agents read/append across tasks
   tasks/
     todo/                # Ready to implement
     in-progress/         # Currently being worked on
@@ -76,3 +77,4 @@ todo/ → (implementer picks up) → in-progress/ → (done) → to-review/ → 
 - Task filenames: zero-padded number + slug, hyphenated (e.g., `01-add-user-auth.md`, `02-fix-cart-total.md`)
 - One task = one coherent unit of work
 - `workflow/definition.md` is the single source of truth for project context — keep it current
+- `workflow/project-memory.md` captures known gotchas — every agent reads it for context, and implementers/reviewers append to it when they learn something non-obvious (error fixes, quirks, constraints)

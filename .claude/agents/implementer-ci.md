@@ -11,15 +11,17 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 
 ## Process
 
-1. Read `workflow/definition.md` for project conventions, tech stack, and architecture.
-2. Read the task file.
-3. Move the task from `todo/` to `in-progress/`. Update its **Status** field. Commit:
+1. Read `workflow/definition.md` for project conventions, tech stack, and architecture. This is required context — if it is still the placeholder or missing, note that and proceed using the codebase itself.
+2. Read `workflow/project-memory.md` for known gotchas that may affect this task.
+3. Read the task file.
+4. Move the task from `todo/` to `in-progress/`. Update its **Status** field. Commit:
    `chore: start [slug]`
-4. Implement the task in logical increments. After each meaningful unit of change, commit with a proper Conventional Commits message.
-5. Verify done criteria are met.
-6. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`. Commit:
+5. Implement the task in logical increments. After each meaningful unit of change, commit with a proper Conventional Commits message.
+6. If you hit and solve a non-obvious problem (a tricky error, an environment quirk, a surprising behavior), append a dated entry to `workflow/project-memory.md` and commit it (`docs: note [gotcha] in project memory`).
+7. Verify done criteria are met.
+8. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`. Commit:
    `chore: move [slug] to to-review`
-7. Report: what was done, list of commits made, anything the reviewer should check.
+9. Report: what was done, list of commits made, anything the reviewer should check.
 
 ## Commit format
 

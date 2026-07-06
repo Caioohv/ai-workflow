@@ -12,13 +12,14 @@ A brief description of the task — provided as an argument or in the first mess
 ## Process
 
 1. Read `workflow/definition.md` to understand the project context, tech stack, and conventions.
-2. List existing tasks across all `workflow/tasks/` subdirectories to avoid duplication and determine the next number.
-3. Analyze the brief. If anything is genuinely unclear and would block writing a good spec, ask the user — keep questions minimal, ask all at once.
-4. Write the task spec using `workflow/templates/task.md` as the template.
-5. Choose a slug: lowercase, hyphenated, descriptive (e.g., `add-user-auth`, `fix-cart-total`).
-6. Determine the next sequence number by finding the highest `NN-` prefix across all task folders and incrementing by 1. Use zero-padded two digits (e.g., `01`, `02`, `12`).
-7. Save to `workflow/tasks/todo/NN-[slug].md` (e.g., `03-add-user-auth.md`).
-8. Confirm: print the file path and a one-line summary of what was created.
+2. Read `workflow/project-memory.md` for known gotchas — factor any relevant ones into the spec (e.g. surface them in the Context section or acceptance criteria).
+3. List existing tasks across all `workflow/tasks/` subdirectories to avoid duplication and determine the next number.
+4. Analyze the brief. If anything is genuinely unclear and would block writing a good spec, ask the user — keep questions minimal, ask all at once.
+5. Write the task spec using `workflow/templates/task.md` as the template.
+6. Choose a slug: lowercase, hyphenated, descriptive (e.g., `add-user-auth`, `fix-cart-total`).
+7. Determine the next sequence number by finding the highest `NN-` prefix across all task folders and incrementing by 1. Use zero-padded two digits (e.g., `01`, `02`, `12`).
+8. Save to `workflow/tasks/todo/NN-[slug].md` (e.g., `03-add-user-auth.md`).
+9. Confirm: print the file path and a one-line summary of what was created.
 
 ## Spec quality rules
 

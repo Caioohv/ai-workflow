@@ -11,16 +11,18 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 
 ## Process
 
-1. Read `workflow/definition.md` for project conventions, tech stack, and architecture.
-2. Read the task file.
-3. Move the task from `todo/` to `in-progress/` and update its **Status** field to `in-progress`.
-4. Implement everything described in the task:
+1. Read `workflow/definition.md` for project conventions, tech stack, and architecture. This is required context — if it is still the placeholder or missing, note that and proceed using the codebase itself.
+2. Read `workflow/project-memory.md` for known gotchas that may affect this task.
+3. Read the task file.
+4. Move the task from `todo/` to `in-progress/` and update its **Status** field to `in-progress`.
+5. Implement everything described in the task:
    - Satisfy every acceptance criterion.
    - Follow conventions from `definition.md`.
    - Stay within scope — do not touch anything listed in "Out of scope".
-5. Verify the done criteria are met.
-6. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`.
-7. Report: what was done, any notable decisions made, and anything the reviewer should pay special attention to.
+6. If you hit and solve a non-obvious problem (a tricky error, an environment quirk, a surprising behavior), append a dated entry to `workflow/project-memory.md` so future tasks don't repeat it.
+7. Verify the done criteria are met.
+8. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`.
+9. Report: what was done, any notable decisions made, and anything the reviewer should pay special attention to.
 
 ## Rules
 

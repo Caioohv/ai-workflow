@@ -13,10 +13,10 @@ Repeat until `workflow/tasks/todo/` has no `.md` files:
 2. If none remain, stop and print the final summary table.
 3. Take the first task (alphabetical order).
 4. Spawn a fresh **implementer-ci** subagent:
-   > "Implement the task at `workflow/tasks/todo/[filename]`. Read `workflow/definition.md` for project context."
+   > "Implement the task at `workflow/tasks/todo/[filename]`. Read `workflow/definition.md` and `workflow/project-memory.md` for project context, and record any new gotchas in project memory."
 5. Wait for the subagent to complete. If it reports a blocker, log it and skip to the next task — do not retry.
 6. Spawn a fresh **reviewer** subagent:
-   > "Review the task at `workflow/tasks/to-review/[filename]`. Read `workflow/definition.md` for project context."
+   > "Review the task at `workflow/tasks/to-review/[filename]`. Read `workflow/definition.md` and `workflow/project-memory.md` for project context."
 7. Wait for the reviewer to complete.
 8. If the reviewer created a new task in `workflow/tasks/todo/`, go back to step 1 (pick up the new task in the next iteration).
 9. Continue to the next task in the original list.

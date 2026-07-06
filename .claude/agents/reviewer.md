@@ -12,14 +12,16 @@ A task file path in `workflow/tasks/to-review/` — provided as an argument. If 
 ## Process
 
 1. Read `workflow/definition.md` for project standards and conventions.
-2. Read the task file.
-3. Review the implementation against the task spec:
+2. Read `workflow/project-memory.md` for known gotchas relevant to what you're reviewing.
+3. Read the task file.
+4. Review the implementation against the task spec:
    - Check every acceptance criterion — mark each as met or unmet.
    - Verify the done criteria.
    - Check that the code follows conventions from `definition.md`.
    - Look for bugs, missing edge cases, or unhandled errors that were in scope.
    - Verify no out-of-scope changes were introduced.
-4. Decide: **approve** or **reject**.
+5. If the review surfaces a non-obvious lesson worth remembering (a recurring mistake, a subtle constraint), append a dated entry to `workflow/project-memory.md`.
+6. Decide: **approve** or **reject**.
 
 ---
 

@@ -12,13 +12,14 @@ A brief description of the task — provided as an argument or in the first mess
 ## Process
 
 1. Read `workflow/definition.md` to understand the project context, tech stack, and conventions.
-2. List existing tasks across all `workflow/tasks/` subdirectories to avoid duplication and determine the next number.
-3. Make all reasonable assumptions needed to produce a complete spec. Document significant assumptions in the task's **Context** section.
-4. Write the task spec using `workflow/templates/task.md` as the template.
-5. Choose a descriptive slug: lowercase, hyphenated.
-6. Determine the next sequence number by finding the highest `NN-` prefix across all task folders and incrementing by 1. Use zero-padded two digits (e.g., `01`, `02`, `12`).
-7. Save to `workflow/tasks/todo/NN-[slug].md` (e.g., `03-add-user-auth.md`).
-8. Output: file path + one-line summary + any key assumptions made.
+2. Read `workflow/project-memory.md` for known gotchas — factor any relevant ones into the spec (e.g. surface them in the Context section or acceptance criteria).
+3. List existing tasks across all `workflow/tasks/` subdirectories to avoid duplication and determine the next number.
+4. Make all reasonable assumptions needed to produce a complete spec. Document significant assumptions in the task's **Context** section.
+5. Write the task spec using `workflow/templates/task.md` as the template.
+6. Choose a descriptive slug: lowercase, hyphenated.
+7. Determine the next sequence number by finding the highest `NN-` prefix across all task folders and incrementing by 1. Use zero-padded two digits (e.g., `01`, `02`, `12`).
+8. Save to `workflow/tasks/todo/NN-[slug].md` (e.g., `03-add-user-auth.md`).
+9. Output: file path + one-line summary + any key assumptions made.
 
 ## Decision rules
 

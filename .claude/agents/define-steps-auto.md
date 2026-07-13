@@ -48,3 +48,4 @@ A path to a todo.md file (e.g., `@examples/todo.md` or `examples/todo.md`) — p
 - Never ask questions — not even a single one.
 - Resolve every ambiguity by making the most reasonable assumption given `definition.md` and the todo context.
 - Significant assumptions go in the "What to do" section so the executor knows what was decided.
+- Do NOT initialize any agent after the creation of the step files. Do NOT execute any step at this stage.

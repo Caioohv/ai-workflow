@@ -4,7 +4,9 @@ Um workflow de desenvolvimento assistido por IA para o Claude Code, focado em ef
 
 ## Como funciona
 
-Agentes especializados cuidam de cada etapa do desenvolvimento. Você descreve o que construir, eles criam specs, implementam e revisam — enquanto as tasks avançam por um pipeline estruturado.
+Dois pipelines complementares cobrem diferentes formas de trabalho:
+
+**Pipeline de tasks** — para desenvolvimento estruturado: specs detalhadas, implementação, revisão.
 
 ```
 todo → in-progress → to-review → done
@@ -12,18 +14,30 @@ todo → in-progress → to-review → done
                     nova task em todo
 ```
 
+**Pipeline de steps** — para execução ágil a partir de uma lista de tarefas simples.
+
+```
+todo.md → steps/todo → steps/in-progress → steps/done (com resumo)
+```
+
 ## Setup
 
-Copie para o seu projeto e comece:
-
 ```bash
-cp -r workflow/ .claude/ CLAUDE.md ~/seu-projeto/
+./setup.sh ~/seu-projeto
 cd ~/seu-projeto
 # abra o Claude Code e rode:
 /initialize
 ```
 
+Para atualizar um projeto existente:
+
+```bash
+./setup.sh ~/seu-projeto --update
+```
+
 ## Agentes
+
+### Pipeline de tasks (desenvolvimento estruturado)
 
 | Agente | Invocação | Descrição |
 |--------|-----------|-----------|
@@ -34,7 +48,16 @@ cd ~/seu-projeto
 | `implementer-ci` | `/implementer-ci <task>` | Implementa com Conventional Commits |
 | `implementer-auto` | `/implementer-auto` | Roda todas as tasks pendentes sem supervisão |
 | `reviewer` | `/reviewer <task>` | Aprova ou rejeita; cria tasks de follow-up na rejeição |
-| `design-system` | `/design-system` | Entrevista você para definir um design system (cores, fontes, espaçamentos) → `workflow/design.md` |
+| `design-system` | `/design-system` | Define design system (cores, fontes, espaçamentos) → `workflow/design.md` |
+
+### Pipeline de steps (execução de lista de tarefas)
+
+| Agente | Invocação | Descrição |
+|--------|-----------|-----------|
+| `define-steps` | `/define-steps <todo.md>` | Expande um todo.md em step specs, pode fazer perguntas |
+| `define-steps-auto` | `/define-steps-auto <todo.md>` | Expande um todo.md em step specs sem perguntar nada |
+| `executor` | `/executor <step>` | Executa um step e registra resumo ao finalizar |
+| `executor-auto` | `/executor-auto` | Roda todos os steps pendentes com Conventional Commits |
 
 ## Skills
 
@@ -49,6 +72,8 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 > `frontend-components` lê `workflow/design.md` como fonte única de verdade.
 
 ## Fluxo típico
+
+### Pipeline de tasks
 
 ```bash
 # 1. Definir o projeto (uma vez)
@@ -65,4 +90,17 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 
 # 4. Revisar (se não usar o implementer-auto)
 /reviewer workflow/tasks/to-review/01-add-login.md
+```
+
+### Pipeline de steps
+
+```bash
+# 1. Expandir uma lista de tarefas em steps
+/define-steps-auto examples/todo.md
+
+# 2a. Executar um step manualmente
+/executor workflow/steps/todo/01-init-project.md
+
+# 2b. Ou executar tudo de uma vez (com commits)
+/executor-auto
 ```

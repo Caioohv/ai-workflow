@@ -44,15 +44,23 @@ mkdir -p \
   "$TARGET/workflow/tasks/todo" \
   "$TARGET/workflow/tasks/in-progress" \
   "$TARGET/workflow/tasks/to-review" \
-  "$TARGET/workflow/tasks/done"
+  "$TARGET/workflow/tasks/done" \
+  "$TARGET/workflow/steps/todo" \
+  "$TARGET/workflow/steps/in-progress" \
+  "$TARGET/workflow/steps/done"
 
 cp -r "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/"
+cp "$SCRIPT_DIR/workflow/definition.md" "$TARGET/workflow/"
+cp "$SCRIPT_DIR/workflow/project-memory.md" "$TARGET/workflow/"
 
 touch \
   "$TARGET/workflow/tasks/todo/.gitkeep" \
   "$TARGET/workflow/tasks/in-progress/.gitkeep" \
   "$TARGET/workflow/tasks/to-review/.gitkeep" \
-  "$TARGET/workflow/tasks/done/.gitkeep"
+  "$TARGET/workflow/tasks/done/.gitkeep" \
+  "$TARGET/workflow/steps/todo/.gitkeep" \
+  "$TARGET/workflow/steps/in-progress/.gitkeep" \
+  "$TARGET/workflow/steps/done/.gitkeep"
 
 if [[ ! -d "$TARGET/.git" ]]; then
   git -C "$TARGET" init -q

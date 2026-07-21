@@ -1,9 +1,11 @@
 ---
 name: frontend-components
-description: Use when building or modifying any frontend/UI code. Favors reusable, composable components over duplication and enforces the design system defined in workflow/design.md (colors, typography, spacing, radii — no hardcoded values).
+description: Use when building or modifying frontend/UI code to enforce REUSE and DESIGN-SYSTEM adherence — search-before-create, extend/compose over duplication, and pull every color, font, spacing, radius, and shadow from the tokens in workflow/design.md (no hardcoded values). This is the framework-agnostic reuse+tokens concern. It does NOT define the atomic folder layering or component composition mechanics — atoms/molecules/organisms/sections structure and prop contracts belong to the framework skills (vue-atomic-design for Vue, react-atomic-design for React). Those decide HOW to compose; this decides whether to reuse and where design values come from.
 ---
 
 You are working on frontend/UI code. Default to **reusable, composable components** and follow the project's design system in `workflow/design.md`. Apply this whenever you create or change anything the user sees — pages, screens, components, or styles.
+
+**Scope of this skill vs the framework skills.** This skill owns two concerns only: (1) **reuse** — search before you create, extend/compose over duplicating; (2) **design-system adherence** — every design value comes from the `design.md` tokens. It does **not** own the atomic layering or composition mechanics. How to structure `atoms/molecules/organisms/sections`, write prop contracts, and declare tokens in CSS is decided by the framework skill for the stack you are in — `vue-atomic-design` (Vue) or `react-atomic-design` (React). These compose: the framework skill lays out and composes the component; this skill keeps it DRY and on-system.
 
 ## Before you write any UI
 

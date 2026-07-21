@@ -17,8 +17,10 @@ workflow/
     todo/                # Steps ready to execute
     in-progress/         # Step currently being executed
     done/                # Completed steps (with execution summary)
+  design.md              # Design system tokens (created by design-system agent)
   templates/
     task.md              # Unified task template
+    design.md            # Design system template
 ```
 
 ## Agents
@@ -34,6 +36,7 @@ workflow/
 | `implementer-ci` | `/implementer-ci <task-path>` | Implements with Conventional Commits |
 | `implementer-auto` | `/implementer-auto` | Runs all todo tasks sequentially (unattended) |
 | `reviewer` | `/reviewer <task-path>` | Reviews a task in to-review/, approves or rejects |
+| `design-system` | `/design-system` | Defines the design system (colors, typography, spacing) — creates `workflow/design.md` |
 
 ### Step pipeline (lightweight execution from a todo list)
 
@@ -43,6 +46,28 @@ workflow/
 | `define-steps-auto` | `/define-steps-auto <todo.md>` | Expands a todo.md into step specs autonomously |
 | `executor` | `/executor <step-path>` | Executes a single step, records summary when done |
 | `executor-auto` | `/executor-auto` | Runs all steps in todo/ sequentially with Conventional Commits |
+
+## Skills
+
+Skills apply automatically when you touch related code. They are **orthogonal and composable**: architecture skills are framework-agnostic; framework skills cover only framework mechanics and delegate architecture to the architecture skills (e.g. "Nest + DDD" loads both without conflict).
+
+| Skill | Applies when |
+|-------|--------------|
+| `clean-architecture` | Deciding which layer code lives in and which way dependencies point (entities/use cases/adapters, ports & adapters, Dependency Rule) |
+| `ddd-tactical` | Modeling the domain — Entity vs Value Object, Aggregates and invariants, Repository, Domain Events/Services, Factories |
+| `express-backend` | Structuring Express code — routers, middleware order, thin controllers, request-id logger |
+| `nestjs-backend` | Writing NestJS code — modules, providers, DI, pipes/guards/interceptors/filters, logging |
+| `api-responses` | Writing endpoint responses (JS/Node) — human-friendly, no leaking of internals |
+| `frontend-components` | Creating/altering UI — component reuse and adherence to `workflow/design.md` tokens (nothing hardcoded) |
+| `vue-atomic-design` | Composing Vue 3 components (SFC, `<script setup>`) with Atomic Design |
+| `react-atomic-design` | Composing React components (`.jsx`/`.tsx`) with Atomic Design |
+| `nuxt-4-dev` | Writing Nuxt 4 — data fetching, SSR, server routes (Nitro), hydration |
+| `testing-jest` | Writing Jest tests — what to test and what to mock per layer (domain, use case, repo, controller) |
+| `security-audit-node` | Auditing security of Node/Express/Nest code — findings report (OWASP); does not write code |
+| `commit-pr-conventions` | Writing a commit message or PR title/description — Conventional Commits + PR template |
+| `content-writer-ptbr` | Writing textual content in PT-BR (titles, copy, microcopy) — strict style rules |
+
+Define the design system with `/design-system` before building the frontend — the `frontend-components` skill reads `workflow/design.md` as the single source of truth.
 
 ## Typical workflow
 

@@ -61,12 +61,40 @@ Para atualizar um projeto existente:
 
 ## Skills
 
-Skills entram em ação automaticamente quando você mexe no código relacionado:
+Skills entram em ação automaticamente quando você mexe no código relacionado. São **ortogonais e componíveis**: skills de arquitetura são agnósticas de framework; skills de framework cobrem só a mecânica e delegam a arquitetura às skills de arquitetura (ex.: "Nest + DDD" carrega as duas, sem conflito).
 
-| Skill | Quando aplica | O que faz |
-|-------|---------------|-----------|
-| `frontend-components` | Ao criar ou alterar UI/front | Prioriza componentes reaproveitáveis e segue os tokens de `workflow/design.md` — nada de cor/fonte/espaçamento hardcoded |
-| `api-responses` | Ao escrever respostas de endpoints (JS/Node) | Retornos human-friendly com formato consistente, sem vazar internals (stack trace, erro de banco, paths, segredos) |
+### Arquitetura (agnósticas de framework)
+
+| Skill | Quando aplica |
+|-------|---------------|
+| `clean-architecture` | Ao decidir em que camada o código vive e para onde as dependências apontam (entities/use cases/adapters, ports & adapters, Dependency Rule) |
+| `ddd-tactical` | Ao modelar o domínio — Entity vs Value Object, Aggregates e invariantes, Repository, Domain Events/Services, Factories |
+
+### Backend
+
+| Skill | Quando aplica |
+|-------|---------------|
+| `express-backend` | Ao estruturar código Express — routers, ordem de middlewares, controllers finos, logger com request-id |
+| `nestjs-backend` | Ao escrever código NestJS — módulos, providers, DI, pipes/guards/interceptors/filters, logging |
+| `api-responses` | Ao escrever respostas de endpoints (JS/Node) — retornos human-friendly, sem vazar internals (stack trace, erro de banco, paths, segredos) |
+
+### Frontend
+
+| Skill | Quando aplica |
+|-------|---------------|
+| `frontend-components` | Ao criar ou alterar UI — reaproveitamento de componentes e adesão aos tokens de `workflow/design.md` (nada hardcoded) |
+| `vue-atomic-design` | Ao compor componentes Vue 3 (SFC, `<script setup>`) com Atomic Design |
+| `react-atomic-design` | Ao compor componentes React (`.jsx`/`.tsx`) com Atomic Design |
+| `nuxt-4-dev` | Ao escrever Nuxt 4 — data fetching, SSR, server routes (Nitro), hidratação |
+
+### Testes, segurança e convenções
+
+| Skill | Quando aplica |
+|-------|---------------|
+| `testing-jest` | Ao escrever testes com Jest — o que testar e o que mockar por camada (domínio, use case, repo, controller) |
+| `security-audit-node` | Ao auditar segurança de código Node/Express/Nest — relatório de findings (OWASP); não escreve código |
+| `commit-pr-conventions` | Ao escrever mensagem de commit ou título/descrição de PR — Conventional Commits + template de PR |
+| `content-writer-ptbr` | Ao redigir conteúdo textual em PT-BR (títulos, copy, microcopy) — regras duras de estilo |
 
 > Defina o design system com `/design-system` antes de construir o front — o skill
 > `frontend-components` lê `workflow/design.md` como fonte única de verdade.

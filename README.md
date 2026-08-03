@@ -1,6 +1,6 @@
 # ai-workflow
 
-Um workflow de desenvolvimento assistido por IA para o Claude Code, focado em eficiência de tokens.
+Um workflow de desenvolvimento assistido por IA compatível com **Claude Code** e **Google Antigravity (Gemini)**, focado em eficiência de tokens.
 
 ## Como funciona
 
@@ -25,9 +25,18 @@ todo.md → steps/todo → steps/in-progress → steps/done (com resumo)
 ```bash
 ./setup.sh ~/seu-projeto
 cd ~/seu-projeto
-# abra o Claude Code e rode:
-/initialize
 ```
+
+Abra o seu assistente preferido na pasta do projeto e inicialize:
+
+* **No Claude Code:**
+  ```bash
+  /initialize
+  ```
+* **No Antigravity (Gemini):**
+  ```bash
+  /initialize
+  ```
 
 Para atualizar um projeto existente:
 

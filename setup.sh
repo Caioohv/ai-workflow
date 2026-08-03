@@ -43,23 +43,32 @@ copy_tree_if_absent() {
 }
 
 if $UPDATE; then
-  if [[ ! -d "$TARGET/.claude" ]]; then
+  if [[ ! -d "$TARGET/.claude" && ! -d "$TARGET/.agents" ]]; then
     echo "Erro: '$TARGET' não tem um workflow instalado. Rode sem --update para fazer o setup inicial."
     exit 1
   fi
 
-  # Atualiza os arquivos gerenciados pelo framework, preservando customizações locais
-  # (settings.local.json) e o conteúdo do usuário (definition.md, project-memory.md, tarefas).
-  rm -rf "$TARGET/.claude/agents" "$TARGET/.claude/skills"
-  cp -r "$SCRIPT_DIR/.claude/agents" "$TARGET/.claude/"
-  cp -r "$SCRIPT_DIR/.claude/skills" "$TARGET/.claude/"
-  cp "$SCRIPT_DIR/.claude/settings.json" "$TARGET/.claude/settings.json"
-  cp "$SCRIPT_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
+  # Atualiza os arquivos gerenciados pelo framework (Claude Code)
+  if [[ -d "$TARGET/.claude" ]]; then
+    rm -rf "$TARGET/.claude/agents" "$TARGET/.claude/skills"
+    cp -r "$SCRIPT_DIR/.claude/agents" "$TARGET/.claude/"
+    cp -r "$SCRIPT_DIR/.claude/skills" "$TARGET/.claude/"
+    cp "$SCRIPT_DIR/.claude/settings.json" "$TARGET/.claude/settings.json"
+    cp "$SCRIPT_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
+  fi
+
+  # Atualiza os arquivos gerenciados pelo framework (Antigravity)
+  rm -rf "$TARGET/.agents/rules" "$TARGET/.agents/skills"
+  mkdir -p "$TARGET/.agents"
+  cp -r "$SCRIPT_DIR/.agents/rules" "$TARGET/.agents/"
+  cp -r "$SCRIPT_DIR/.agents/skills" "$TARGET/.agents/"
+  cp "$SCRIPT_DIR/GEMINI.md" "$TARGET/GEMINI.md"
+
   rm -rf "$TARGET/workflow/templates"
   cp -r "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/"
 
   echo "Workflow atualizado em: $TARGET"
-  echo "Customizações locais (settings.local.json) e conteúdo de workflow/ foram preservados."
+  echo "Customizações locais e conteúdo de workflow/ foram preservados."
   exit 0
 fi
 
@@ -67,7 +76,9 @@ mkdir -p "$TARGET"
 
 # Setup inicial: copia tudo, mas nunca sobrescreve arquivos que já existam no destino.
 copy_tree_if_absent "$SCRIPT_DIR/.claude" "$TARGET/.claude"
+copy_tree_if_absent "$SCRIPT_DIR/.agents" "$TARGET/.agents"
 copy_if_absent "$SCRIPT_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
+copy_if_absent "$SCRIPT_DIR/GEMINI.md" "$TARGET/GEMINI.md"
 copy_tree_if_absent "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/templates"
 copy_if_absent "$SCRIPT_DIR/workflow/definition.md" "$TARGET/workflow/definition.md"
 copy_if_absent "$SCRIPT_DIR/workflow/project-memory.md" "$TARGET/workflow/project-memory.md"
@@ -96,4 +107,4 @@ if [[ ! -d "$TARGET/.git" ]]; then
 fi
 
 echo "Setup concluído em: $TARGET"
-echo "Abra o Claude Code na pasta e rode /initialize para começar."
+echo "Abra o Claude Code ou o Antigravity na pasta e rode /initialize para começar."

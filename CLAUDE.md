@@ -42,6 +42,7 @@ workflow/
 
 | Agent | Invocation | Description |
 |-------|-----------|-------------|
+| `todo-planner` | `/todo-planner <description>` | Turns a free-form description into a simple `todo.md` of small, executable, verifiable steps (feeds `define-steps`) |
 | `define-steps` | `/define-steps <todo.md>` | Expands a todo.md into step specs, may ask questions |
 | `define-steps-auto` | `/define-steps-auto <todo.md>` | Expands a todo.md into step specs autonomously |
 | `executor` | `/executor <step-path>` | Executes a single step, records summary when done |
@@ -107,6 +108,12 @@ Approved → `done/`. Rejected → new task created in `todo/`.
 Processes all tasks in `todo/`, runs reviewer after each, and loops until the queue is empty.
 
 ### Step pipeline
+
+#### Planning a todo list from a description
+```
+/todo-planner create a nuxt app
+```
+Turns the description into a simple numbered `todo.md` (small, executable, verifiable steps) in `workflow/todos/`. Then feed it to `define-steps`.
 
 #### Defining steps from a todo list
 ```

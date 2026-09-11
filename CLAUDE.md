@@ -8,6 +8,7 @@ This project uses a structured AI-assisted development workflow. Tasks move thro
 workflow/
   definition.md          # Project definition (created by initialize agent)
   project-memory.md      # Known gotchas — running log agents read/append across tasks
+  todos/                 # todo.md lists (created by todo-planner from a description)
   tasks/
     todo/                # Ready to implement
     in-progress/         # Currently being worked on
@@ -148,6 +149,8 @@ todo/ → (executor picks up) → in-progress/ → (done, summary appended) → 
 
 - Task filenames: zero-padded number + slug, hyphenated (e.g., `01-add-user-auth.md`, `02-fix-cart-total.md`)
 - Step filenames: same convention (e.g., `01-init-project.md`, `02-write-endpoint.md`)
+- todo.md filenames: zero-padded number + slug + `-todo` suffix (e.g., `01-create-nuxt-app-todo.md`), saved in `workflow/todos/`
+- A `todo.md` is a flat numbered list — one small, executable, verifiable step per line; detail is added later by `define-steps`
 - One task = one coherent unit of work; one step = one line from the todo list
 - `workflow/definition.md` is the single source of truth for project context — keep it current
 - `workflow/project-memory.md` captures known gotchas — every agent reads it for context, and implementers/reviewers/executors append to it when they learn something non-obvious

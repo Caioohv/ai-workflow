@@ -17,7 +17,7 @@ todo → in-progress → to-review → done
 **Pipeline de steps** — para execução ágil a partir de uma lista de tarefas simples.
 
 ```
-todo.md → steps/todo → steps/in-progress → steps/done (com resumo)
+descrição → todo.md → steps/todo → steps/in-progress → steps/done (com resumo)
 ```
 
 ## Setup
@@ -63,6 +63,7 @@ Para atualizar um projeto existente:
 
 | Agente | Invocação | Descrição |
 |--------|-----------|-----------|
+| `todo-planner` | `/todo-planner <descrição>` | Transforma uma descrição livre em um `todo.md` de passos pequenos, executáveis e verificáveis (alimenta o `define-steps`) |
 | `define-steps` | `/define-steps <todo.md>` | Expande um todo.md em step specs, pode fazer perguntas |
 | `define-steps-auto` | `/define-steps-auto <todo.md>` | Expande um todo.md em step specs sem perguntar nada |
 | `executor` | `/executor <step>` | Executa um step e registra resumo ao finalizar |
@@ -132,12 +133,15 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 ### Pipeline de steps
 
 ```bash
-# 1. Expandir uma lista de tarefas em steps
-/define-steps-auto examples/todo.md
+# 1. Gerar um todo.md a partir de uma descrição
+/todo-planner criar um app nuxt
 
-# 2a. Executar um step manualmente
+# 2. Expandir a lista de tarefas em steps
+/define-steps-auto workflow/todos/01-criar-app-nuxt-todo.md
+
+# 3a. Executar um step manualmente
 /executor workflow/steps/todo/01-init-project.md
 
-# 2b. Ou executar tudo de uma vez (com commits)
+# 3b. Ou executar tudo de uma vez (com commits)
 /executor-auto
 ```

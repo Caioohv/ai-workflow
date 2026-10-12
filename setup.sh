@@ -143,3 +143,4 @@ fi
 
 echo "Setup concluído em: $TARGET"
 echo 'Abra o Codex e use $discover, ou o Claude Code/Antigravity e use /discover.'
+echo 'Em dúvida sobre o próximo passo? Use $orchestrator (Codex) ou /orchestrator.'

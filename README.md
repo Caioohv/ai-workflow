@@ -100,10 +100,16 @@ Referências: [instruções com AGENTS.md](https://learn.chatgpt.com/docs/agent-
 
 ## Agentes
 
+Não sabe por onde começar ou qual é o próximo passo? Use o `orchestrator`
+(`/orchestrator` no Claude Code e no Antigravity, `$orchestrator` no Codex). Ele lê
+o estado de `workflow/`, resume como o workflow funciona, indica o próximo comando
+e lista as alternativas. É somente leitura: orienta, mas não executa outros agentes.
+
 ### Pipeline de tasks (desenvolvimento estruturado)
 
 | Agente | Invocação | Descrição |
 |--------|-----------|-----------|
+| `orchestrator` | `/orchestrator [pergunta]` | Orienta: indica o próximo passo, as possibilidades e resume o workflow |
 | `discover` | `/discover` | Entrevista você para definir o projeto → `workflow/definition.md` |
 | `spec-creator` | `/spec-creator <brief>` | Cria uma spec de task, pode fazer perguntas |
 | `spec-creator-auto` | `/spec-creator-auto <brief>` | Cria uma spec de task sem perguntar nada |

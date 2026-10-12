@@ -34,6 +34,7 @@ class SetupTests(unittest.TestCase):
         for name in (
             "AGENTS.md", "CLAUDE.md", "GEMINI.md", ".claude/settings.json",
             ".claude/agents/implementer.md", ".agents/rules/rules.md",
+            ".claude/agents/orchestrator.md", ".agents/skills/orchestrator/SKILL.md",
             ".agents/skills/todo-planner/SKILL.md",
             ".agents/skills/implementer-auto/SKILL.md",
             "workflow/definition.md", "workflow/project-memory.md",

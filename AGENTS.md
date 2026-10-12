@@ -21,6 +21,7 @@ Invoke a skill with `$skill-name` followed by its input, or ask for it by name.
 
 | Goal | Skill and input |
 |------|-----------------|
+| Get oriented: next step and options | `$orchestrator [question]` |
 | Define the project | `$discover` |
 | Define design tokens | `$design-system` |
 | Create a task spec | `$spec-creator <brief>` or `$spec-creator-auto <brief>` |

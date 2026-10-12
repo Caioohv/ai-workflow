@@ -31,6 +31,7 @@ These commands are defined as skills under `.agents/skills/` and can be invoked 
 
 | Command | Invocation | Description |
 |---------|------------|-------------|
+| `orchestrator` | `/orchestrator [question]` | Guides you: inspects `workflow/`, recommends the next step, lists the options and summarizes how the workflow works |
 | `discover` | `/discover` | Interactive project setup — creates `workflow/definition.md` |
 | `spec-creator` | `/spec-creator <brief>` | Creates a task spec, may ask questions |
 | `spec-creator-auto` | `/spec-creator-auto <brief>` | Creates a task spec autonomously |
@@ -72,6 +73,12 @@ Skills apply automatically when you touch related code. They are **orthogonal an
 Define the design system with `/design-system` before building the frontend — the `frontend-components` skill reads `workflow/design.md` as the single source of truth.
 
 ## Typical workflow
+
+### Not sure what to do next
+```
+/orchestrator
+```
+Reads the current state of `workflow/` and replies with where you are, the exact next command, and the alternatives. Read-only — it never runs other skills.
 
 ### Starting a project
 ```

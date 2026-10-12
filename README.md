@@ -31,15 +31,15 @@ Abra o seu assistente preferido na pasta do projeto e inicialize:
 
 * **No Codex:**
   ```text
-  $initialize
+  $discover
   ```
 * **No Claude Code:**
   ```bash
-  /initialize
+  /discover
   ```
 * **No Antigravity (Gemini):**
   ```bash
-  /initialize
+  /discover
   ```
 
 Para atualizar um projeto existente:
@@ -69,7 +69,7 @@ Os exemplos com `/nome` nas outras seções são para Claude Code e Antigravity.
 Use `$nome` para executar a mesma etapa no Codex.
 
 ```text
-$initialize
+$discover
 $spec-creator adicionar login com email e senha
 $implementer-ci workflow/tasks/todo/01-add-login.md
 $reviewer workflow/tasks/to-review/01-add-login.md
@@ -104,7 +104,7 @@ Referências: [instruções com AGENTS.md](https://learn.chatgpt.com/docs/agent-
 
 | Agente | Invocação | Descrição |
 |--------|-----------|-----------|
-| `initialize` | `/initialize` | Entrevista você para definir o projeto → `workflow/definition.md` |
+| `discover` | `/discover` | Entrevista você para definir o projeto → `workflow/definition.md` |
 | `spec-creator` | `/spec-creator <brief>` | Cria uma spec de task, pode fazer perguntas |
 | `spec-creator-auto` | `/spec-creator-auto <brief>` | Cria uma spec de task sem perguntar nada |
 | `implementer` | `/implementer <task>` | Implementa uma task, sem commits |
@@ -169,7 +169,7 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 
 ```bash
 # 1. Definir o projeto (uma vez)
-/initialize
+/discover
 
 # 2. Criar uma task
 /spec-creator adicionar login com email e senha

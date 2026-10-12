@@ -9,7 +9,7 @@ configuration for the other harnesses, not Codex agent registrations or rules.
 
 - Read `workflow/definition.md` and `workflow/project-memory.md` before planning,
   implementing, executing, or reviewing work. If the definition is a placeholder,
-  infer context from the repository; use `$initialize` when asked to define it.
+  infer context from the repository; use `$discover` when asked to define it.
 - For UI work, read `workflow/design.md` and apply `frontend-components` plus the
   framework skill. Use `$design-system` when the design system needs defining.
 - Load relevant technical skills as needed rather than reading every skill.
@@ -21,7 +21,7 @@ Invoke a skill with `$skill-name` followed by its input, or ask for it by name.
 
 | Goal | Skill and input |
 |------|-----------------|
-| Define the project | `$initialize` |
+| Define the project | `$discover` |
 | Define design tokens | `$design-system` |
 | Create a task spec | `$spec-creator <brief>` or `$spec-creator-auto <brief>` |
 | Implement one task without commits | `$implementer workflow/tasks/todo/NN-slug.md` |

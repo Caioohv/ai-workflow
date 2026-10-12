@@ -6,7 +6,7 @@ This project uses a structured AI-assisted development workflow. Tasks move thro
 
 ```
 workflow/
-  definition.md          # Project definition (created by initialize agent)
+  definition.md          # Project definition (created by discover agent)
   project-memory.md      # Known gotchas — running log agents read/append across tasks
   todos/                 # todo.md lists (created by todo-planner from a description)
   tasks/
@@ -30,7 +30,7 @@ workflow/
 
 | Agent | Invocation | Description |
 |-------|-----------|-------------|
-| `initialize` | `/initialize` | Interactive project setup — creates `workflow/definition.md` |
+| `discover` | `/discover` | Interactive project setup — creates `workflow/definition.md` |
 | `spec-creator` | `/spec-creator <brief>` | Creates a task spec, may ask questions |
 | `spec-creator-auto` | `/spec-creator-auto <brief>` | Creates a task spec autonomously |
 | `implementer` | `/implementer <task-path>` | Implements a task, no commits |
@@ -75,7 +75,7 @@ Define the design system with `/design-system` before building the frontend — 
 
 ### Starting a project
 ```
-/initialize
+/discover
 ```
 Walks through an interview to define the project. Creates `workflow/definition.md`.
 

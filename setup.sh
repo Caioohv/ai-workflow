@@ -142,4 +142,4 @@ if [[ ! -d "$TARGET/.git" ]]; then
 fi
 
 echo "Setup concluído em: $TARGET"
-echo 'Abra o Codex e use $initialize, ou o Claude Code/Antigravity e use /initialize.'
+echo 'Abra o Codex e use $discover, ou o Claude Code/Antigravity e use /discover.'

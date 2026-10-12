@@ -20,6 +20,38 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+if [[ -d "$TARGET" && "$(cd "$TARGET" && pwd -P)" == "$(cd "$SCRIPT_DIR" && pwd -P)" ]]; then
+  echo "Erro: use uma pasta de destino diferente do repositório do setup."
+  exit 1
+fi
+
+# Atualiza somente o bloco do workflow, preservando instruções locais do projeto.
+install_codex_instructions() {
+  local dest="$TARGET/AGENTS.md" temp
+  temp="$(mktemp "$TARGET/.ai-workflow-agents.XXXXXX")"
+  if [[ -f "$dest" ]]; then
+    if ! awk '
+      $0 == "<!-- ai-workflow:begin -->" {
+        if (managed || seen) exit 1
+        managed = 1; seen = 1; next
+      }
+      $0 == "<!-- ai-workflow:end -->" {
+        if (!managed) exit 1
+        managed = 0; next
+      }
+      !managed { print }
+      END { if (managed) exit 1 }
+    ' "$dest" > "$temp"; then
+      rm -f "$temp"
+      echo "Erro: bloco ai-workflow inválido em $dest. Corrija os marcadores antes de continuar."
+      exit 1
+    fi
+  fi
+  cat "$SCRIPT_DIR/AGENTS.md" >> "$temp"
+  mv "$temp" "$dest"
+  echo "  instruções Codex atualizadas: $dest"
+}
+
 # Copia um arquivo apenas se ele ainda não existir no destino (nunca sobrescreve).
 copy_if_absent() {
   local src="$1" dest="$2"
@@ -63,12 +95,13 @@ if $UPDATE; then
   cp -r "$SCRIPT_DIR/.agents/rules" "$TARGET/.agents/"
   cp -r "$SCRIPT_DIR/.agents/skills" "$TARGET/.agents/"
   cp "$SCRIPT_DIR/GEMINI.md" "$TARGET/GEMINI.md"
+  install_codex_instructions
 
   rm -rf "$TARGET/workflow/templates"
   cp -r "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/"
 
   echo "Workflow atualizado em: $TARGET"
-  echo "Customizações locais e conteúdo de workflow/ foram preservados."
+  echo "Conteúdo de workflow/ e instruções locais de AGENTS.md preservados; agentes, skills, regras e templates atualizados."
   exit 0
 fi
 
@@ -79,11 +112,13 @@ copy_tree_if_absent "$SCRIPT_DIR/.claude" "$TARGET/.claude"
 copy_tree_if_absent "$SCRIPT_DIR/.agents" "$TARGET/.agents"
 copy_if_absent "$SCRIPT_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
 copy_if_absent "$SCRIPT_DIR/GEMINI.md" "$TARGET/GEMINI.md"
+install_codex_instructions
 copy_tree_if_absent "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/templates"
 copy_if_absent "$SCRIPT_DIR/workflow/definition.md" "$TARGET/workflow/definition.md"
 copy_if_absent "$SCRIPT_DIR/workflow/project-memory.md" "$TARGET/workflow/project-memory.md"
 
 mkdir -p \
+  "$TARGET/workflow/todos" \
   "$TARGET/workflow/tasks/todo" \
   "$TARGET/workflow/tasks/in-progress" \
   "$TARGET/workflow/tasks/to-review" \
@@ -107,4 +142,4 @@ if [[ ! -d "$TARGET/.git" ]]; then
 fi
 
 echo "Setup concluído em: $TARGET"
-echo "Abra o Claude Code ou o Antigravity na pasta e rode /initialize para começar."
+echo 'Abra o Codex e use $initialize, ou o Claude Code/Antigravity e use /initialize.'

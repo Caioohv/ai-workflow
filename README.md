@@ -1,6 +1,6 @@
 # ai-workflow
 
-Um workflow de desenvolvimento assistido por IA compatível com **Claude Code** e **Google Antigravity (Gemini)**, focado em eficiência de tokens.
+Um workflow de desenvolvimento assistido por IA compatível com **Codex**, **Claude Code** e **Google Antigravity (Gemini)**, focado em eficiência de tokens.
 
 ## Como funciona
 
@@ -29,6 +29,10 @@ cd ~/seu-projeto
 
 Abra o seu assistente preferido na pasta do projeto e inicialize:
 
+* **No Codex:**
+  ```text
+  $initialize
+  ```
 * **No Claude Code:**
   ```bash
   /initialize
@@ -43,6 +47,56 @@ Para atualizar um projeto existente:
 ```bash
 ./setup.sh ~/seu-projeto --update
 ```
+
+O setup instala os três harnesses. A atualização também adiciona suporte ao Codex
+em projetos que já usam Claude Code ou Antigravity. O conteúdo de `workflow/`
+é preservado, exceto os templates, que são atualizados junto com agentes, skills
+e regras do framework.
+
+O instalador mantém as instruções locais de `AGENTS.md` e atualiza apenas o bloco
+entre `<!-- ai-workflow:begin -->` e `<!-- ai-workflow:end -->`. Coloque suas regras
+do projeto fora desse bloco. Esses marcadores são reservados ao setup.
+
+## Usando com Codex
+
+O Codex carrega as instruções de `AGENTS.md` e descobre as skills em
+`.agents/skills/`, compartilhadas com o Antigravity. O setup mantém as configurações
+do Claude em `.claude/`.
+
+No Codex, invoque as skills com `$nome-da-skill` ou peça pelo nome em linguagem
+natural. No CLI e na extensão IDE, `/skills` permite consultar as skills disponíveis.
+Os exemplos com `/nome` nas outras seções são para Claude Code e Antigravity.
+Use `$nome` para executar a mesma etapa no Codex.
+
+```text
+$initialize
+$spec-creator adicionar login com email e senha
+$implementer-ci workflow/tasks/todo/01-add-login.md
+$reviewer workflow/tasks/to-review/01-add-login.md
+```
+
+Para o pipeline de steps:
+
+```text
+$todo-planner criar um app nuxt
+$define-steps-auto workflow/todos/01-criar-app-nuxt-todo.md
+$executor-auto
+```
+
+`$implementer-auto` processa a fila de tasks com revisão após cada implementação.
+Os orquestradores usam subagentes quando a sessão oferece essa capacidade e
+entregam a cada worker o caminho da skill e os arquivos de contexto. Quando a
+delegação está indisponível, executam as etapas na sessão atual e informam que a
+revisão ocorreu nessa mesma sessão. Itens bloqueados são registrados e os demais
+itens elegíveis continuam. As permissões da sessão continuam valendo nas rotinas
+automáticas.
+
+Você pode alternar entre harnesses: todos usam os mesmos arquivos e status em
+`workflow/`. Após instalar ou atualizar, reabra a sessão se as skills não aparecerem.
+
+Referências: [instruções com AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md),
+[skills do Codex](https://learn.chatgpt.com/docs/build-skills) e
+[subagentes](https://learn.chatgpt.com/docs/agent-configuration/subagents).
 
 ## Agentes
 
@@ -144,4 +198,13 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 
 # 3b. Ou executar tudo de uma vez (com commits)
 /executor-auto
+```
+
+## Verificar o instalador
+
+Os testes usam projetos temporários e exigem Python 3 e Git:
+
+```bash
+bash -n setup.sh
+python3 -B -m unittest discover -s tests -v
 ```

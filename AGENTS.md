@@ -12,6 +12,8 @@ configuration for the other harnesses, not Codex agent registrations or rules.
   infer context from the repository; use `$discover` when asked to define it.
 - For UI work, read `workflow/design.md` and apply `frontend-components` plus the
   framework skill. Use `$design-system` when the design system needs defining.
+- Skim `workflow/decisions/` and follow accepted ADRs relevant to the work; record
+  new significant technical decisions there with `adr-decisions`.
 - Load relevant technical skills as needed rather than reading every skill.
 - Record non-obvious solutions and gotchas in `workflow/project-memory.md`.
 

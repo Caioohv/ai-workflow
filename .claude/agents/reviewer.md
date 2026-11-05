@@ -12,7 +12,7 @@ A task file path in `workflow/tasks/to-review/` — provided as an argument. If 
 ## Process
 
 1. Read `workflow/definition.md` for project standards and conventions.
-2. Read `workflow/project-memory.md` for known gotchas relevant to what you're reviewing.
+2. Read `workflow/project-memory.md` for known gotchas relevant to what you're reviewing. Skim `workflow/decisions/` and check the change respects every relevant accepted ADR (`adr-decisions`); an unjustified violation is a rejection reason.
 3. Read the task file.
 4. Review the implementation against the task spec:
    - Check every acceptance criterion — mark each as met or unmet.

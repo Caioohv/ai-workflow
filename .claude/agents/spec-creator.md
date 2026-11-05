@@ -12,7 +12,7 @@ A brief description of the task — provided as an argument or in the first mess
 ## Process
 
 1. Read `workflow/definition.md` to understand the project context, tech stack, and conventions.
-2. Read `workflow/project-memory.md` for known gotchas — factor any relevant ones into the spec (e.g. surface them in the Context section or acceptance criteria).
+2. Read `workflow/project-memory.md` for known gotchas — factor any relevant ones into the spec (e.g. surface them in the Context section or acceptance criteria). Skim `workflow/decisions/` for accepted ADRs the spec must respect; if the task requires a new significant decision, record it per `adr-decisions`.
 3. List existing tasks across all `workflow/tasks/` subdirectories to avoid duplication and determine the next number.
 4. Analyze the brief. If anything is genuinely unclear and would block writing a good spec, ask the user — keep questions minimal, ask all at once.
 5. Write the task spec using `workflow/templates/task.md` as the template.

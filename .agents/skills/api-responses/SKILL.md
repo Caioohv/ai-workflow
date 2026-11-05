@@ -1,6 +1,9 @@
 ---
 name: api-responses
-description: Use when writing or modifying JavaScript/Node API endpoint responses (Express, Fastify, NestJS, Next.js/Remix route handlers, etc.). Ensures responses are human-friendly and never leak internals — stack traces, DB/ORM errors, file paths, secrets, internal IDs or enums.
+description: >-
+  Write or change JS/Node API endpoint responses (Express, Fastify, NestJS,
+  Next/Remix handlers): human-friendly bodies that never leak internals such
+  as stack traces, DB/ORM errors, file paths, secrets, internal IDs or enums.
 ---
 
 You are writing or changing **JavaScript/Node API responses**. Make every response **human-friendly** and make sure it **never leaks internal details** to the client. Apply this whenever you touch route handlers, controllers, or error-handling middleware (Express, Fastify, NestJS, Next.js/Remix route handlers, etc.).

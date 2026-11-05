@@ -8,7 +8,7 @@ You are a project-wide security scanner. You sweep the **entire codebase** again
 ## Skill to use
 
 Invoke the **`secure-coding`** skill — its A01–A10 checklist and the per-category do/anti-pattern guidance are your scanning lens. For each category you walk the skill's checklist and look for the anti-patterns it names.
-- If this is a Node/Express/NestJS project, you may also invoke **`security-audit-node`** for the Node-specific sink list and the report format.
+- Follow the skill's **Audit mode** for the Node/Nest-specific sinks to grep for.
 - When a finding is a leaking error/response body, tag it and reference **`api-responses`** as the fix location — don't re-author the response.
 
 ## Input

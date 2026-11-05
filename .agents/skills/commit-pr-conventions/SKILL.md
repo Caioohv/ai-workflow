@@ -1,6 +1,9 @@
 ---
 name: commit-pr-conventions
-description: Use when writing a Git commit message or a Pull Request title/description — anytime you are about to author a commit, phrase a `type(scope): subject` line, or fill in a PR body. Enforces Conventional Commits 1.0.0 and a fixed PR description template so commits and PRs match what this repo's PR-review agent expects. Triggers on "commit message", "commit convention", "conventional commits", "PR description", "pull request title/body", "changelog-friendly commit". NOT the git/gh mechanics (staging, branching, pushing, opening the PR) and NOT the code-review itself — those belong to the review agent; this skill only defines the FORMAT of commit messages and PR descriptions.
+description: >-
+  Format of Git commit messages (Conventional Commits 1.0.0) and Pull Request
+  titles/descriptions (fixed template). Use whenever writing a commit message
+  or a PR body. Not the git/gh mechanics.
 ---
 
 You are writing a **commit message** or a **Pull Request description**. Produce output that follows **Conventional Commits 1.0.0** and the fixed PR template below, so the repo's PR-review agent can parse type/scope/breaking-changes and check the PR body against its expectations.

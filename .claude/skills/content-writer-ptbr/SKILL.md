@@ -1,16 +1,10 @@
 ---
 name: content-writer-ptbr
 description: >-
-  Use ao REDIGIR ou CRIAR conteúdo textual em PORTUGUÊS DO BRASIL para páginas —
-  títulos, subtítulos, parágrafos, CTAs e microcopy (copy de landing page, seções
-  de site, textos de marketing, arquivos .md/.mdx de conteúdo). Dispara quando o
-  trabalho é ESCREVER O TEXTO que o usuário vai ler. Aplica regras duras de estilo
-  PT-BR: proíbe travessão como recurso, emojis e padrões clássicos de IA ("Não é
-  sobre X, é sobre Y", tricolon, "Não apenas... mas também", conectivos de
-  preenchimento, conclusões e hedging). NÃO dispara em contexto de código,
-  programação ou comentários de código. NÃO cuida de estrutura de componentes,
-  layout ou decisões visuais — isso é das skills de frontend (Vue/React). Esta
-  skill cuida do TEXTO, não do componente que o exibe.
+  Use ao redigir texto em português do Brasil que o usuário final vai ler
+  (títulos, parágrafos, CTAs, microcopy, landing pages, .md/.mdx de conteúdo).
+  Regras duras de estilo: sem travessão, sem emojis, sem padrões típicos de
+  IA. Não dispara para código ou comentários.
 ---
 
 # Escritor de conteúdo (PT-BR) para páginas

@@ -1,6 +1,10 @@
 ---
-name: nuxt-development
-description: Build, review, and refactor Nuxt applications following the framework's own documented conventions. Use this skill whenever the user is writing Nuxt/Vue meta-framework code, structuring a Nuxt project, choosing a data-fetching or rendering strategy, wiring server routes (Nitro), managing SSR-safe state, or debugging hydration/double-fetch/state-leak issues, even if they don't explicitly say "Nuxt best practices". Targets Nuxt 4 (app/ directory, shared data fetching, stricter TS) and flags Nuxt 3 differences where relevant.
+name: nuxt-4-dev
+description: >-
+  Nuxt 4 conventions: app/ structure, data fetching (useFetch, useAsyncData,
+  $fetch), rendering and routeRules, SSR-safe state, Nitro server routes. Use
+  for any Nuxt code, review or debugging (double fetch, state leak between
+  users, hydration mismatch).
 ---
 
 # Nuxt Development

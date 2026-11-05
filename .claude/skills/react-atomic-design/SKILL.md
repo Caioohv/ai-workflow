@@ -1,199 +1,90 @@
 ---
 name: react-atomic-design
-description: Use when writing or structuring React component code (.jsx/.tsx, function components) that should follow Atomic Design — organizing UI as atoms/molecules/organisms/sections, passing data top-down via props and composing with children/render props, and consuming design tokens through CSS variables (var(--...)). Triggers on React composition, atomic layering, and CSS-variable design tokens. Not for Vue (see the Vue sibling skill) or Nuxt (see nuxt-4-dev), and not for global state architecture, which belongs to a sibling skill.
+description: >-
+  Compose React components (.jsx/.tsx) with Atomic Design: atoms, molecules,
+  organisms, sections; data via props, composition with children, design
+  tokens via CSS variables. Use for any React component structure.
 ---
 
-You are writing React UI code that follows **Atomic Design** with **design tokens as CSS variables**. Apply this whenever you create or restructure React components. This skill decides the folder layout, naming, prop contract, and token wiring for you — follow the defaults below instead of inventing your own.
+You write **React** UI with **Atomic Design** and design tokens as CSS variables.
 
-## What this skill decides for you (defaults, not options)
+## Defaults (not options)
 
-- **Function components only.** No class components. Use hooks for local behavior.
-- **Data flows top-down via props.** A component never reaches for external/global state; whatever it renders comes from props. Lifting state up is the caller's job.
-- **Composition over configuration.** Prefer `children` and slot/render props over ever-growing boolean flags.
-- **Tokens are CSS variables.** Every color, font, space, radius, and size is `var(--token)`. Never a raw hex, px font-size, or magic spacing number in a component.
-- **One component = one file = one folder**, co-locating its styles and test.
+- Function components and hooks only.
+- **Data top-down via props.** Atoms → organisms never import a store, context or query; sections/pages do and pass data down.
+- **Composition over configuration:** `children` and ReactNode slot props (`header`, `footer`) instead of growing boolean flags.
+- Every color, font, spacing, size and radius is `var(--token)` from `src/styles/tokens.css` (values come from `workflow/design.md`). No raw hex, `px` font sizes or magic numbers.
+- One component per PascalCase folder: `Component.tsx`, `Component.module.css`, `Component.test.tsx`, `index.ts` re-export.
 
-## Folder structure
+## Layers
 
 ```
-src/
-  styles/
-    tokens.css          # :root design tokens — the single source of truth
-  components/
-    atoms/
-      Button/
-        Button.tsx
-        Button.module.css
-        Button.test.tsx
-        index.ts        # re-export: export { Button } from './Button'
-    molecules/
-      Field/
-        Field.tsx
-        Field.module.css
-        index.ts
-    organisms/
-      LoginForm/
-        LoginForm.tsx
-        index.ts
-    sections/
-      AuthSection/
-        AuthSection.tsx
-        index.ts
+src/components/
+  atoms/       # no dependency on other components — Button, Input, Text, Icon
+  molecules/   # a few atoms for one job — Field = label + Input + error
+  organisms/   # self-contained UI block; may hold ephemeral UI/form state — LoginForm, Header
+  sections/    # page-level composition; receives data from the page and passes it down
+src/styles/tokens.css
 ```
 
-**Layer meaning (decide placement by this):**
-- **atoms** — indivisible primitives with no dependency on other components (Button, Input, Text, Icon).
-- **molecules** — a small group of atoms wired for one job (Field = Label + Input + error Text).
-- **organisms** — a self-contained section of UI composed of molecules/atoms (LoginForm, Header, Card list).
-- **sections** — page-level composition of organisms; receives data from the page/route and passes it down. No fetching logic beyond what props carry.
+## Naming and props
 
-## Naming conventions
+- Props type `ComponentNameProps`, always explicit.
+- Booleans read as states (`isLoading`, `hasError`, `disabled`); callbacks `on` + verb (`onSubmit`, `onValueChange`).
+- `variant`/`size` string unions, never separate components (`PrimaryButton` ✘). More than ~2 combinable booleans → collapse into a `variant`.
+- Atoms that map to one element spread native props (`...rest`) and forward `ref`.
+- CSS Module classes camelCase (`styles.root`); tokens named `--color-*`, `--font-*`, `--space-*`, `--size-*`, `--radius-*`.
 
-- Component + folder + file: `PascalCase` (`Button`, `LoginForm`).
-- Props type: `ComponentNameProps` (`ButtonProps`).
-- Boolean props read as adjectives/states: `isLoading`, `hasError`, `disabled`.
-- Event props: `on` + verb (`onSubmit`, `onValueChange`).
-- Variant/size are enumerated string props, never separate components: `variant="primary"`, not `PrimaryButton`.
-- CSS Module classes: `camelCase` (`styles.root`, `styles.isDisabled`).
-- Token names: `--color-*`, `--font-*`, `--space-*`, `--size-*`, `--radius-*`.
-
-## Prop contract rules
-
-- Type every component's props explicitly (`type Props = { ... }`).
-- Accept `children: React.ReactNode` whenever the component wraps content — favor it over a `content` string prop.
-- For multiple insertion points, use **named slots as render props or ReactNode props** (`header`, `footer`) instead of adding flags.
-- Forward the underlying DOM props you don't own with `...rest`, and forward `ref` on atoms that map to a single element.
-- Keep prop lists small: if an atom grows more than ~2 booleans that combine, collapse them into a single `variant` union.
-
-## Design tokens (CSS variables)
-
-Define tokens once in `styles/tokens.css`, imported once at the app root. Components only ever read them.
-
-```css
-/* styles/tokens.css */
-:root {
-  /* color */
-  --color-primary: #2563eb;
-  --color-on-primary: #ffffff;
-  --color-text: #111827;
-  --color-danger: #dc2626;
-
-  /* typography */
-  --font-sans: system-ui, sans-serif;
-  --font-size-md: 1rem;
-  --font-weight-bold: 600;
-
-  /* spacing scale */
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-
-  /* sizing & radius */
-  --size-control-h: 2.5rem;
-  --radius-md: 0.375rem;
-}
-```
-
-## Examples (short, one per pattern)
-
-**Atom** — reads tokens, forwards native props, variant not subclass:
+## Example
 
 ```tsx
 // atoms/Button/Button.tsx
-import styles from './Button.module.css';
+import styles from './Button.module.css'
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'ghost';
-  children: React.ReactNode;
-};
+  variant?: 'primary' | 'ghost'
+  children: React.ReactNode
+}
 
 export function Button({ variant = 'primary', children, ...rest }: ButtonProps) {
-  return (
-    <button className={`${styles.root} ${styles[variant]}`} {...rest}>
-      {children}
-    </button>
-  );
+  return <button className={`${styles.root} ${styles[variant]}`} {...rest}>{children}</button>
 }
 ```
 
 ```css
 /* atoms/Button/Button.module.css */
-.root {
-  height: var(--size-control-h);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
-  font: var(--font-weight-bold) var(--font-size-md) var(--font-sans);
-  border: none;
-  cursor: pointer;
-}
+.root { height: var(--size-control-h); padding: 0 var(--space-4); border-radius: var(--radius-md); font: var(--font-weight-bold) var(--font-size-md) var(--font-sans); }
 .primary { background: var(--color-primary); color: var(--color-on-primary); }
-.ghost   { background: transparent; color: var(--color-primary); }
+.ghost { background: transparent; color: var(--color-primary); }
 ```
 
-**Molecule** — composes atoms, data in via props, no state of its own:
-
 ```tsx
-// molecules/Field/Field.tsx
-import { Input } from '../../atoms/Input';
-import styles from './Field.module.css';
-
-type FieldProps = {
-  label: string;
-  error?: string;
-  value: string;
-  onValueChange: (v: string) => void;
-};
-
-export function Field({ label, error, value, onValueChange }: FieldProps) {
-  return (
-    <label className={styles.root}>
-      <span className={styles.label}>{label}</span>
-      <Input value={value} onChange={(e) => onValueChange(e.target.value)} />
-      {error && <span className={styles.error}>{error}</span>}
-    </label>
-  );
-}
-```
-
-**Organism** — composes molecules, exposes an `onSubmit` callback, holds only ephemeral form state, renders a `footer` slot via composition:
-
-```tsx
-// organisms/LoginForm/LoginForm.tsx
-import { useState } from 'react';
-import { Field } from '../../molecules/Field';
-import { Button } from '../../atoms/Button';
-
-type LoginFormProps = {
-  onSubmit: (data: { email: string; password: string }) => void;
-  footer?: React.ReactNode;
-};
+// organisms/LoginForm/LoginForm.tsx — ephemeral form state, intent emitted upward, footer slot
+type LoginFormProps = { onSubmit: (d: { email: string; password: string }) => void; footer?: React.ReactNode }
 
 export function LoginForm({ onSubmit, footer }: LoginFormProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit({ email, password }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); onSubmit({ email, password }) }}>
       <Field label="Email" value={email} onValueChange={setEmail} />
       <Field label="Password" value={password} onValueChange={setPassword} />
       <Button type="submit">Sign in</Button>
       {footer}
     </form>
-  );
+  )
 }
 ```
 
-## Checklist before you finish
+## Checklist
 
-- [ ] Component is a function component in its own PascalCase folder with an `index.ts` re-export
-- [ ] Placed in the correct layer (atom/molecule/organism/section) by its dependencies
-- [ ] All data arrives via props; nothing reaches into global state
-- [ ] `children`/slot props used for composition instead of extra boolean flags
-- [ ] No raw hex, px font-size, or magic spacing — every value is a `var(--token)`
-- [ ] Variants/sizes are string-union props, not duplicated components
+- [ ] Own PascalCase folder with `index.ts`; correct layer by its dependencies.
+- [ ] Data via props; no global state below sections.
+- [ ] `children`/slot props instead of extra flags; variants as unions.
+- [ ] Every visual value is a `var(--token)`.
 
-## Out of scope (belongs to sibling skills)
+## Out of scope
 
-- **Concrete visual/aesthetic decisions** (which palette, exact scale values, look-and-feel) — a sibling design/aesthetics skill owns the token *values*; this skill only owns the token *mechanism*.
-- **Global/app state architecture** (stores, context providers, data fetching/caching strategy) — a sibling state-architecture skill. Here, data always arrives as props.
-- **Vue** (see the Vue Atomic Design sibling skill) and **Nuxt** (see `nuxt-4-dev`). This skill is React-only.
+- Token values and palette → `design-system` agent / `workflow/design.md`; reuse rules → `frontend-components`.
+- Stores, context architecture, data fetching → `state-management`.
+- Vue → `vue-atomic-design`; Nuxt → `nuxt-4-dev`.

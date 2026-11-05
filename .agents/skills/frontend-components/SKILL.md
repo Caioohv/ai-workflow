@@ -1,6 +1,10 @@
 ---
 name: frontend-components
-description: Use when building or modifying frontend/UI code to enforce REUSE and DESIGN-SYSTEM adherence — search-before-create, extend/compose over duplication, and pull every color, font, spacing, radius, and shadow from the tokens in workflow/design.md (no hardcoded values). This is the framework-agnostic reuse+tokens concern. It does NOT define the atomic folder layering or component composition mechanics — atoms/molecules/organisms/sections structure and prop contracts belong to the framework skills (vue-atomic-design for Vue, react-atomic-design for React). Those decide HOW to compose; this decides whether to reuse and where design values come from.
+description: >-
+  Use when building or changing UI: search for and reuse existing components
+  before creating new ones, and take every color, font, spacing, radius and
+  shadow from the workflow/design.md tokens (nothing hardcoded).
+  Framework-agnostic; pairs with the Vue/React atomic skills.
 ---
 
 You are working on frontend/UI code. Default to **reusable, composable components** and follow the project's design system in `workflow/design.md`. Apply this whenever you create or change anything the user sees — pages, screens, components, or styles.
@@ -52,3 +56,9 @@ If you catch yourself copy-pasting markup or styles, stop and extract a componen
 ## Output
 
 When you finish, briefly note which existing components you reused and any new reusable component you introduced (name + purpose), so the catalogue stays discoverable.
+
+## Out of scope
+
+- Atomic folder layering, prop/emit contracts and composition mechanics → `vue-atomic-design` / `react-atomic-design`.
+- Picking the actual palette and type scale → the `design-system` agent (`workflow/design.md`).
+- Where state lives → `state-management`.

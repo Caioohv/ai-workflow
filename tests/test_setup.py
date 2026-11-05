@@ -39,7 +39,9 @@ class SetupTests(unittest.TestCase):
             ".agents/skills/implementer-auto/SKILL.md",
             "workflow/definition.md", "workflow/project-memory.md",
             "workflow/templates/task.md", "workflow/tasks/to-review",
-            "workflow/steps/done", "workflow/todos", ".git",
+            "workflow/steps/done", "workflow/todos", "workflow/decisions",
+            "workflow/templates/adr.md", ".claude/skills/state-management/SKILL.md",
+            ".agents/skills/state-management/SKILL.md", ".git",
         ):
             self.assertTrue((self.target / name).exists(), name)
         self.assertEqual((self.target / "AGENTS.md").read_text(), (REPO / "AGENTS.md").read_text())
@@ -90,6 +92,7 @@ class SetupTests(unittest.TestCase):
                 self.run_setup("--update", target=target)
                 self.assertTrue((target / "AGENTS.md").is_file())
                 self.assertTrue((target / ".agents/skills/todo-planner/SKILL.md").is_file())
+                self.assertTrue((target / "workflow/decisions").is_dir())
                 self.assertEqual((target / "workflow/definition.md").read_text(), "Existing definition")
 
     def test_invalid_markers_do_not_destroy_local_instructions(self):

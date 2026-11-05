@@ -99,8 +99,9 @@ if $UPDATE; then
 
   rm -rf "$TARGET/workflow/templates"
   cp -r "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/"
-  mkdir -p "$TARGET/workflow/manual-tasks"
+  mkdir -p "$TARGET/workflow/manual-tasks" "$TARGET/workflow/decisions"
   [[ -f "$TARGET/workflow/manual-tasks/.gitkeep" ]] || touch "$TARGET/workflow/manual-tasks/.gitkeep"
+  [[ -f "$TARGET/workflow/decisions/.gitkeep" ]] || touch "$TARGET/workflow/decisions/.gitkeep"
 
   echo "Workflow atualizado em: $TARGET"
   echo "Conteúdo de workflow/ e instruções locais de AGENTS.md preservados; agentes, skills, regras e templates atualizados."
@@ -122,6 +123,7 @@ copy_if_absent "$SCRIPT_DIR/workflow/project-memory.md" "$TARGET/workflow/projec
 mkdir -p \
   "$TARGET/workflow/todos" \
   "$TARGET/workflow/manual-tasks" \
+  "$TARGET/workflow/decisions" \
   "$TARGET/workflow/tasks/todo" \
   "$TARGET/workflow/tasks/in-progress" \
   "$TARGET/workflow/tasks/to-review" \
@@ -132,6 +134,7 @@ mkdir -p \
 
 touch \
   "$TARGET/workflow/manual-tasks/.gitkeep" \
+  "$TARGET/workflow/decisions/.gitkeep" \
   "$TARGET/workflow/tasks/todo/.gitkeep" \
   "$TARGET/workflow/tasks/in-progress/.gitkeep" \
   "$TARGET/workflow/tasks/to-review/.gitkeep" \

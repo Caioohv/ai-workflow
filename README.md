@@ -22,6 +22,8 @@ descrição → todo.md → steps/todo → steps/in-progress → steps/done (com
 
 **Tarefas manuais (`workflow/manual-tasks/`)** — sempre que houver alguma ação que precise ser realizada pelo usuário (ex.: acessar servidor, configurar banco de dados, obter/configurar credenciais e chaves externas), os agentes criam um arquivo `.md` em `workflow/manual-tasks/` com orientações passo a passo claras para o usuário.
 
+**Decisões (`workflow/decisions/`)** — decisões técnicas significativas e difíceis de reverter (banco, ORM, estratégia de auth, estilo de API) viram ADRs curtos a partir de `workflow/templates/adr.md`. Os agentes leem os ADRs relevantes antes de especificar, implementar ou revisar, e o reviewer rejeita mudanças que violem um ADR aceito sem outro que o substitua.
+
 ## Setup
 
 ```bash
@@ -149,6 +151,9 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 | `express-backend` | Ao estruturar código Express — routers, ordem de middlewares, controllers finos, logger com request-id |
 | `nestjs-backend` | Ao escrever código NestJS — módulos, providers, DI, pipes/guards/interceptors/filters, logging |
 | `api-responses` | Ao escrever respostas de endpoints (JS/Node) — retornos human-friendly, sem vazar internals (stack trace, erro de banco, paths, segredos) |
+| `api-design` | Ao desenhar o contrato de uma API HTTP — URLs, métodos, status codes, paginação/filtros, versionamento, idempotência, OpenAPI |
+| `database-persistence` | Ao mexer na persistência — schema, índices, migrations (expand → contract), repositories com ORM, transações, N+1 |
+| `env-config` | Ao adicionar ou ler variáveis de ambiente — módulo de config tipado e validado no boot, `.env.example`, públicas vs server-only |
 
 ### Frontend
 
@@ -158,18 +163,33 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 | `vue-atomic-design` | Ao compor componentes Vue 3 (SFC, `<script setup>`) com Atomic Design |
 | `react-atomic-design` | Ao compor componentes React (`.jsx`/`.tsx`) com Atomic Design |
 | `nuxt-4-dev` | Ao escrever Nuxt 4 — data fetching, SSR, server routes (Nitro), hidratação |
+| `state-management` | Ao decidir onde vive o estado do front — local, URL, cache do servidor ou store; Pinia/Zustand, TanStack Query |
 
-### Testes, segurança e convenções
+### Testes, segurança, infra e convenções
 
 | Skill | Quando aplica |
 |-------|---------------|
 | `testing-jest` | Ao escrever testes com Jest — o que testar e o que mockar por camada (domínio, use case, repo, controller) |
-| `security-audit-node` | Ao auditar segurança de código Node/Express/Nest — relatório de findings (OWASP); não escreve código |
+| `secure-coding` | Ao escrever, endurecer ou auditar código sensível (auth, crypto, queries, uploads, segredos) — seguro por padrão com checklist OWASP/CWE; no modo auditoria só gera relatório |
+| `performance` | Ao otimizar — Web Vitals, bundle, custo de renderização, event loop, cache; sempre medindo antes e depois |
+| `docker-ci` | Ao escrever Dockerfile, docker-compose de dependências de dev e pipelines de CI (GitHub Actions) |
+| `adr-decisions` | Ao tomar uma decisão técnica significativa — registra um ADR em `workflow/decisions/` e respeita os já aceitos |
 | `commit-pr-conventions` | Ao escrever mensagem de commit ou título/descrição de PR — Conventional Commits + template de PR |
 | `content-writer-ptbr` | Ao redigir conteúdo textual em PT-BR (títulos, copy, microcopy) — regras duras de estilo |
 
 > Defina o design system com `/design-system` antes de construir o front — o skill
 > `frontend-components` lê `workflow/design.md` como fonte única de verdade.
+
+### Economia de tokens
+
+A descrição de cada skill fica no contexto o tempo todo, inclusive em cada subagente. O corpo só carrega quando a skill dispara. Por isso:
+
+- descrições curtas (até 350 caracteres), só com o que a skill faz e os gatilhos; as fronteiras com outras skills ficam na seção "Out of scope" do corpo;
+- o corpo traz regras, escolhas padrão do projeto e checklist, não teoria que o modelo já conhece;
+- `CLAUDE.md`, `GEMINI.md` e `.agents/rules/rules.md` são curtos e não repetem as tabelas deste README;
+- `.claude/skills/` e `.agents/skills/` têm conteúdo idêntico.
+
+Os testes em `tests/test_skills.py` garantem essas regras.
 
 ## Fluxo típico
 

@@ -8,6 +8,7 @@ This project uses a structured AI-assisted development workflow. Tasks move thro
 workflow/
   definition.md          # Project definition (created by discover agent)
   project-memory.md      # Known gotchas — running log agents read/append across tasks
+  manual-tasks/          # Tasks requiring manual user action (server access, DB setup, keys, etc.)
   todos/                 # todo.md lists (created by todo-planner from a description)
   tasks/
     todo/                # Ready to implement
@@ -22,6 +23,7 @@ workflow/
   templates/
     task.md              # Unified task template
     design.md            # Design system template
+    manual-task.md       # Manual task template for user guidance
 ```
 
 ## Agents
@@ -161,3 +163,4 @@ todo/ → (executor picks up) → in-progress/ → (done, summary appended) → 
 - One task = one coherent unit of work; one step = one line from the todo list
 - `workflow/definition.md` is the single source of truth for project context — keep it current
 - `workflow/project-memory.md` captures known gotchas — every agent reads it for context, and implementers/reviewers/executors append to it when they learn something non-obvious
+- Manual tasks: Whenever a task requires manual actions by the user (e.g., accessing a server, configuring a database, provisioning third-party credentials/services), create a markdown file in `workflow/manual-tasks/` (e.g., `workflow/manual-tasks/NN-[slug].md` using `workflow/templates/manual-task.md`) with clear step-by-step guidance for the user. Do this whenever necessary and inform the user.

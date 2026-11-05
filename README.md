@@ -20,6 +20,8 @@ todo → in-progress → to-review → done
 descrição → todo.md → steps/todo → steps/in-progress → steps/done (com resumo)
 ```
 
+**Tarefas manuais (`workflow/manual-tasks/`)** — sempre que houver alguma ação que precise ser realizada pelo usuário (ex.: acessar servidor, configurar banco de dados, obter/configurar credenciais e chaves externas), os agentes criam um arquivo `.md` em `workflow/manual-tasks/` com orientações passo a passo claras para o usuário.
+
 ## Setup
 
 ```bash

@@ -28,6 +28,7 @@ A brief description of the task — provided as an argument or in the first mess
 - **Implementation steps guide without over-constraining** — leave room for judgment on minor details.
 - **Do not invent technical decisions** not grounded in `definition.md` or the user's brief.
 - **Out of scope is mandatory** — always explicitly list what this task does NOT cover.
+- **Manual tasks for user**: If the task involves prerequisites or actions that must be performed manually by the user (e.g., accessing a remote server, configuring database credentials/access, setting up third-party services/keys), clearly document them and create a guidance file in `workflow/manual-tasks/NN-[slug].md` (using `workflow/templates/manual-task.md`).
 
 ## When to ask questions
 

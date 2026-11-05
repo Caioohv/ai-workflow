@@ -19,14 +19,18 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
    - Satisfy every acceptance criterion.
    - Follow conventions from `definition.md`.
    - Stay within scope — do not touch anything listed in "Out of scope".
-6. If you hit and solve a non-obvious problem (a tricky error, an environment quirk, a surprising behavior), append a dated entry to `workflow/project-memory.md` so future tasks don't repeat it.
-7. Verify the done criteria are met.
-8. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`.
-9. Report: what was done, any notable decisions made, and anything the reviewer should pay special attention to.
+6. If any action must be performed manually by the user (e.g., accessing a remote server, configuring database instances/credentials, provisioning third-party API keys or services):
+   - Create a markdown file in `workflow/manual-tasks/NN-[slug].md` (using `workflow/templates/manual-task.md`) with clear step-by-step instructions for the user.
+   - Note the manual task in the final report.
+7. If you hit and solve a non-obvious problem (a tricky error, an environment quirk, a surprising behavior), append a dated entry to `workflow/project-memory.md` so future tasks don't repeat it.
+8. Verify the done criteria are met.
+9. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`.
+10. Report: what was done, any notable decisions made, any manual tasks created in `workflow/manual-tasks/`, and anything the reviewer should pay special attention to.
 
 ## Rules
 
 - If you hit a genuine blocker (missing information, conflicting requirements, a design decision beyond your authority), stop and report it clearly. Do not guess at major design decisions.
+- Whenever user action is required (e.g., server access, database configuration, external secrets/tokens), always create an instruction file in `workflow/manual-tasks/` with clear steps for the user and notify them.
 - Do not add features beyond what the task specifies.
 - Do not refactor code outside the task's scope.
 - Leave the codebase in a working, runnable state — no half-finished implementations.

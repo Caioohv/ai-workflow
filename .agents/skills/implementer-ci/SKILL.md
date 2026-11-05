@@ -17,11 +17,15 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 4. Move the task from `todo/` to `in-progress/`. Update its **Status** field. Commit:
    `chore: start [slug]`
 5. Implement the task in logical increments. After each meaningful unit of change, commit with a proper Conventional Commits message.
-6. If you hit and solve a non-obvious problem (a tricky error, an environment quirk, a surprising behavior), append a dated entry to `workflow/project-memory.md` and commit it (`docs: note [gotcha] in project memory`).
-7. Verify done criteria are met.
-8. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`. Commit:
+6. If any action must be performed manually by the user (e.g., accessing a remote server, configuring database instances/credentials, provisioning third-party API keys or services):
+   - Create a markdown file in `workflow/manual-tasks/NN-[slug].md` (using `workflow/templates/manual-task.md`) with clear step-by-step instructions for the user.
+   - Commit: `docs: add manual task for [slug]`
+   - Note the manual task clearly in the final report.
+7. If you hit and solve a non-obvious problem (a tricky error, an environment quirk, a surprising behavior), append a dated entry to `workflow/project-memory.md` and commit it (`docs: note [gotcha] in project memory`).
+8. Verify done criteria are met.
+9. Move the task from `in-progress/` to `to-review/`. Update its **Status** field to `to-review`. Commit:
    `chore: move [slug] to to-review`
-9. Report: what was done, list of commits made, anything the reviewer should check.
+10. Report: what was done, list of commits made, any manual tasks created in `workflow/manual-tasks/`, anything the reviewer should check.
 
 ## Commit format
 
@@ -45,6 +49,7 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 - A new module + its tests = one commit.
 - Prefer small, focused commits over large dumps.
 - Moving a task file is always its own `chore` commit.
+- Adding a manual task file for the user is its own `docs` commit (`docs: add manual task for [slug]`).
 
 ## Rules
 

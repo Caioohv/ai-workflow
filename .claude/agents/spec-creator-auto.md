@@ -27,6 +27,7 @@ A brief description of the task — provided as an argument or in the first mess
 - If the brief implies multiple independent tasks, create all of them.
 - Default to the simpler, more conservative interpretation when scope is unclear.
 - Note every significant assumption in the **Context** section so the implementer and reviewer know what was decided and why.
+- If the task requires actions that only the user can perform (e.g., accessing a remote server, configuring database credentials/access, setting up third-party services/keys), document them clearly and create a step-by-step guidance file in `workflow/manual-tasks/NN-[slug].md` (using `workflow/templates/manual-task.md`).
 
 ## Rules
 

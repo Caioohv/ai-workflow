@@ -88,6 +88,20 @@ class SetupTests(unittest.TestCase):
             (REPO / ".claude/agents/executor.md").read_text(),
         )
 
+    def test_update_replaces_untouched_legacy_copies(self):
+        self.run_setup()
+        for name in ("CLAUDE.md", "GEMINI.md"):
+            legacy = subprocess.run(["git", "-C", str(REPO), "show", f"c562e9e:{name}"],
+                                    capture_output=True, text=True)
+            if legacy.returncode != 0:
+                self.skipTest("framework history unavailable")
+            (self.target / name).write_text(legacy.stdout)
+        (self.target / "GEMINI.md").write_text((self.target / "GEMINI.md").read_text() + "edited\n")
+        self.run_setup("--update")
+        self.assertEqual((self.target / "CLAUDE.md").read_text(), (REPO / "CLAUDE.md").read_text())
+        self.assertTrue((self.target / "GEMINI.md").read_text().startswith("# Antigravity"))
+        self.assertEqual((self.target / "GEMINI.md").read_text().count(BEGIN), 1)
+
     def test_update_removes_only_files_dropped_from_framework(self):
         self.run_setup()
         manifest = self.target / "workflow/.ai-workflow-manifest"

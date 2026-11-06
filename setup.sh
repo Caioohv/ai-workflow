@@ -46,6 +46,46 @@ if $WITH_CLAUDE; then
   BLOCK_FILES+=(CLAUDE.md)
 fi
 
+# sha256 de versões antigas de CLAUDE.md/GEMINI.md, instaladas inteiras antes do bloco gerenciado.
+# Um arquivo idêntico a uma delas é só do framework e pode ser substituído pelo bloco.
+LEGACY_HASHES=(
+  135d269ee037042fccdbcf75c2be609fd6e05292ae001baca919ce6e3f555bf4
+  213b4aaed6f09c53b8d2a3e4f384f495f3dd597857b51a6229f83d307c0ff58e
+  2be501c7d44114748626a3a5211b8f335b8898943321f7da4178b8584d665353
+  330ac85be32655e6769e2f3d050d23b06ee7575087e44c4041dd8789f0226272
+  4fc7bebfd1260f40eb9cfcf57d41ca913c9188f064ece98973e6b4a550a23154
+  56c03ebecc9183f6397b3566fe879c632c06eb911f0cc9e4ed65d98336735d97
+  649a215ff735c73a50b3349bd9b560058b3a71efdcf3378d12a0c46563590a28
+  866e3d155c6566ff71e1bd673e84778c960871ee63cdf94e9cf03093badf36d4
+  979446df2877a6c31f18897566d6412d4ffa3f5a4820d8f1731e97af9bf7c0b5
+  c0ec9941ebdb489e3ff200e843a7391c03eeb5e7bba64cd9f90a40125db20088
+  cadd35c96d33e5c7e5640a0debdd57e0d489ec94fc9ade236a953a9c84fec416
+  d397a94448fd4d2c1622012be1c729e5177b693fbe0a51b0295e4a964ca49d43
+  da9b561de77ad83948a52b977b262dc99c5a878d8c9e1d3573f17b30182072da
+  f01daa6bc2812b176f348e907fd122e78a13aa66f7629d677da5371338141e91
+  f30a271938158daad9cbb238f580c1d0b730515da8b9cc595522382e369a3f2e
+  f7a686cc1b910c603aaecb06b0e6b9ae969556df70f3733ff27339944e8fa484
+)
+
+file_sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | cut -d' ' -f1
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | cut -d' ' -f1
+  fi
+}
+
+is_legacy_copy() {
+  local hash h
+  grep -Fxq -- "$BEGIN_MARK" "$1" && return 1
+  hash="$(file_sha256 "$1")"
+  [[ -n "$hash" ]] || return 1
+  for h in "${LEGACY_HASHES[@]}"; do
+    [[ "$h" == "$hash" ]] && return 0
+  done
+  return 1
+}
+
 # Imprime o arquivo sem o bloco gerenciado; falha se os marcadores estiverem inválidos.
 strip_block() {
   awk -v begin="$BEGIN_MARK" -v end="$END_MARK" '
@@ -73,7 +113,7 @@ done
 install_block() {
   local name="$1" dest="$TARGET/$1" temp
   temp="$(mktemp "$TARGET/.ai-workflow-block.XXXXXX")"
-  if [[ -f "$dest" ]]; then
+  if [[ -f "$dest" ]] && ! is_legacy_copy "$dest"; then
     strip_block "$dest" > "$temp"
   fi
   cat "$SCRIPT_DIR/$name" >> "$temp"

@@ -25,31 +25,61 @@ if [[ -d "$TARGET" && "$(cd "$TARGET" && pwd -P)" == "$(cd "$SCRIPT_DIR" && pwd 
   exit 1
 fi
 
-# Atualiza somente o bloco do workflow, preservando instruções locais do projeto.
-install_codex_instructions() {
-  local dest="$TARGET/AGENTS.md" temp
-  temp="$(mktemp "$TARGET/.ai-workflow-agents.XXXXXX")"
-  if [[ -f "$dest" ]]; then
-    if ! awk '
-      $0 == "<!-- ai-workflow:begin -->" {
-        if (managed || seen) exit 1
-        managed = 1; seen = 1; next
-      }
-      $0 == "<!-- ai-workflow:end -->" {
-        if (!managed) exit 1
-        managed = 0; next
-      }
-      !managed { print }
-      END { if (managed) exit 1 }
-    ' "$dest" > "$temp"; then
-      rm -f "$temp"
-      echo "Erro: bloco ai-workflow inválido em $dest. Corrija os marcadores antes de continuar."
-      exit 1
-    fi
+if $UPDATE && [[ ! -d "$TARGET/.claude" && ! -d "$TARGET/.agents" ]]; then
+  echo "Erro: '$TARGET' não tem um workflow instalado. Rode sem --update para fazer o setup inicial."
+  exit 1
+fi
+
+BEGIN_MARK="<!-- ai-workflow:begin -->"
+END_MARK="<!-- ai-workflow:end -->"
+MANIFEST="$TARGET/workflow/.ai-workflow-manifest"
+
+# Instalação nova, ou atualização de um projeto que já usa Claude Code, recebe os arquivos do Claude.
+WITH_CLAUDE=true
+if $UPDATE && [[ ! -d "$TARGET/.claude" ]]; then
+  WITH_CLAUDE=false
+fi
+
+# Instruções com bloco gerenciado: o conteúdo local fica, o bloco do framework vai para o fim.
+BLOCK_FILES=(AGENTS.md GEMINI.md)
+if $WITH_CLAUDE; then
+  BLOCK_FILES+=(CLAUDE.md)
+fi
+
+# Imprime o arquivo sem o bloco gerenciado; falha se os marcadores estiverem inválidos.
+strip_block() {
+  awk -v begin="$BEGIN_MARK" -v end="$END_MARK" '
+    $0 == begin {
+      if (managed || seen) exit 1
+      managed = 1; seen = 1; next
+    }
+    $0 == end {
+      if (!managed) exit 1
+      managed = 0; next
+    }
+    !managed { print }
+    END { if (managed) exit 1 }
+  ' "$1"
+}
+
+# Valida todos os marcadores antes de mudar qualquer arquivo.
+for name in "${BLOCK_FILES[@]}"; do
+  if [[ -f "$TARGET/$name" ]] && ! strip_block "$TARGET/$name" > /dev/null; then
+    echo "Erro: bloco ai-workflow inválido em $TARGET/$name. Corrija os marcadores antes de continuar."
+    exit 1
   fi
-  cat "$SCRIPT_DIR/AGENTS.md" >> "$temp"
+done
+
+install_block() {
+  local name="$1" dest="$TARGET/$1" temp
+  temp="$(mktemp "$TARGET/.ai-workflow-block.XXXXXX")"
+  if [[ -f "$dest" ]]; then
+    strip_block "$dest" > "$temp"
+  fi
+  cat "$SCRIPT_DIR/$name" >> "$temp"
+  chmod 644 "$temp"
   mv "$temp" "$dest"
-  echo "  instruções Codex atualizadas: $dest"
+  echo "  instruções atualizadas: $dest"
 }
 
 # Copia um arquivo apenas se ele ainda não existir no destino (nunca sobrescreve).
@@ -64,59 +94,92 @@ copy_if_absent() {
   fi
 }
 
-# Copia uma pasta recursivamente, arquivo a arquivo, sem sobrescrever o que já existe.
-copy_tree_if_absent() {
-  local src_dir="$1" dest_dir="$2"
-  local f rel
-  while IFS= read -r -d '' f; do
-    rel="${f#"$src_dir"/}"
-    copy_if_absent "$f" "$dest_dir/$rel"
-  done < <(find "$src_dir" -type f -print0)
+# Arquivos que pertencem ao framework, relativos à raiz do projeto.
+managed_list() {
+  local roots=(.agents/skills .agents/rules workflow/templates)
+  if $WITH_CLAUDE; then
+    roots=(.claude/agents .claude/skills "${roots[@]}")
+  fi
+  {
+    (cd "$SCRIPT_DIR" && find "${roots[@]}" -type f ! -name '.DS_Store')
+    echo workflow/verify.sh
+  } | LC_ALL=C sort
 }
 
+# Só caminhos dentro das pastas do framework podem ser removidos a partir do manifesto.
+is_managed_path() {
+  case "$1" in
+    *..* | /*) return 1 ;;
+    .claude/agents/* | .claude/skills/* | .agents/skills/* | .agents/rules/* | workflow/templates/* | workflow/verify.sh) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# Remove arquivos que o framework instalou antes e não distribui mais. Os do projeto ficam.
+remove_obsolete() {
+  local list="$1" f dir
+  if [[ ! -f "$MANIFEST" ]]; then
+    return 0
+  fi
+  while IFS= read -r f; do
+    if ! is_managed_path "$f" || grep -Fxq -- "$f" "$list"; then
+      continue
+    fi
+    if [[ -f "$TARGET/$f" ]]; then
+      rm -f "$TARGET/$f"
+      echo "  removido (saiu do framework): $f"
+    fi
+  done < "$MANIFEST"
+  for dir in .claude/agents .claude/skills .agents/skills .agents/rules workflow/templates; do
+    if [[ -d "$TARGET/$dir" ]]; then
+      find "$TARGET/$dir" -mindepth 1 -type d -empty -delete
+    fi
+  done
+}
+
+install_managed() {
+  local list="$1" overwrite="$2" f
+  while IFS= read -r f; do
+    if $overwrite; then
+      mkdir -p "$(dirname "$TARGET/$f")"
+      cp "$SCRIPT_DIR/$f" "$TARGET/$f"
+    else
+      copy_if_absent "$SCRIPT_DIR/$f" "$TARGET/$f"
+    fi
+  done < "$list"
+  chmod +x "$TARGET/workflow/verify.sh"
+  cp "$list" "$MANIFEST"
+}
+
+mkdir -p "$TARGET/workflow"
+LIST="$(mktemp "$TARGET/.ai-workflow-list.XXXXXX")"
+trap 'rm -f "$LIST"' EXIT
+managed_list > "$LIST"
+
 if $UPDATE; then
-  if [[ ! -d "$TARGET/.claude" && ! -d "$TARGET/.agents" ]]; then
-    echo "Erro: '$TARGET' não tem um workflow instalado. Rode sem --update para fazer o setup inicial."
-    exit 1
+  remove_obsolete "$LIST"
+  install_managed "$LIST" true
+  if $WITH_CLAUDE; then
+    copy_if_absent "$SCRIPT_DIR/.claude/settings.json" "$TARGET/.claude/settings.json"
   fi
-
-  # Atualiza os arquivos gerenciados pelo framework (Claude Code)
-  if [[ -d "$TARGET/.claude" ]]; then
-    rm -rf "$TARGET/.claude/agents" "$TARGET/.claude/skills"
-    cp -r "$SCRIPT_DIR/.claude/agents" "$TARGET/.claude/"
-    cp -r "$SCRIPT_DIR/.claude/skills" "$TARGET/.claude/"
-    cp "$SCRIPT_DIR/.claude/settings.json" "$TARGET/.claude/settings.json"
-    cp "$SCRIPT_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
-  fi
-
-  # Atualiza os arquivos gerenciados pelo framework (Antigravity)
-  rm -rf "$TARGET/.agents/rules" "$TARGET/.agents/skills"
-  mkdir -p "$TARGET/.agents"
-  cp -r "$SCRIPT_DIR/.agents/rules" "$TARGET/.agents/"
-  cp -r "$SCRIPT_DIR/.agents/skills" "$TARGET/.agents/"
-  cp "$SCRIPT_DIR/GEMINI.md" "$TARGET/GEMINI.md"
-  install_codex_instructions
-
-  rm -rf "$TARGET/workflow/templates"
-  cp -r "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/"
+  for name in "${BLOCK_FILES[@]}"; do
+    install_block "$name"
+  done
   mkdir -p "$TARGET/workflow/manual-tasks" "$TARGET/workflow/decisions"
-  [[ -f "$TARGET/workflow/manual-tasks/.gitkeep" ]] || touch "$TARGET/workflow/manual-tasks/.gitkeep"
-  [[ -f "$TARGET/workflow/decisions/.gitkeep" ]] || touch "$TARGET/workflow/decisions/.gitkeep"
+  touch "$TARGET/workflow/manual-tasks/.gitkeep" "$TARGET/workflow/decisions/.gitkeep"
 
   echo "Workflow atualizado em: $TARGET"
-  echo "Conteúdo de workflow/ e instruções locais de AGENTS.md preservados; agentes, skills, regras e templates atualizados."
+  echo "Atualizados: agentes, skills, regras, templates e workflow/verify.sh do framework, e o bloco ai-workflow das instruções."
+  echo "Preservados: estado em workflow/, texto fora do bloco ai-workflow, agentes/skills/regras do projeto e .claude/settings.json."
   exit 0
 fi
 
-mkdir -p "$TARGET"
-
-# Setup inicial: copia tudo, mas nunca sobrescreve arquivos que já existam no destino.
-copy_tree_if_absent "$SCRIPT_DIR/.claude" "$TARGET/.claude"
-copy_tree_if_absent "$SCRIPT_DIR/.agents" "$TARGET/.agents"
-copy_if_absent "$SCRIPT_DIR/CLAUDE.md" "$TARGET/CLAUDE.md"
-copy_if_absent "$SCRIPT_DIR/GEMINI.md" "$TARGET/GEMINI.md"
-install_codex_instructions
-copy_tree_if_absent "$SCRIPT_DIR/workflow/templates" "$TARGET/workflow/templates"
+# Setup inicial: nunca sobrescreve arquivos que já existam no destino.
+install_managed "$LIST" false
+copy_if_absent "$SCRIPT_DIR/.claude/settings.json" "$TARGET/.claude/settings.json"
+for name in "${BLOCK_FILES[@]}"; do
+  install_block "$name"
+done
 copy_if_absent "$SCRIPT_DIR/workflow/definition.md" "$TARGET/workflow/definition.md"
 copy_if_absent "$SCRIPT_DIR/workflow/project-memory.md" "$TARGET/workflow/project-memory.md"
 

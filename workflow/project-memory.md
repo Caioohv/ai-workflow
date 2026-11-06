@@ -1,21 +1,12 @@
 # Project Memory
 
-> Running log of **known gotchas** — non-obvious things worth remembering across tasks:
-> solutions to tricky errors, surprising behaviors, environment quirks, and decisions
-> that future work must respect.
+> Known gotchas: non-obvious things that would have saved time (tricky errors, surprising
+> behavior, environment quirks). Every agent reads this file before working, so keep it
+> short: one line per entry, newest first, at most ~60 entries. When adding, merge
+> duplicates and delete entries that are no longer true.
 >
-> Agents read this before implementing and append new entries when they learn something
-> that would have saved them time. Keep entries short and factual. Newest at the top.
+> Format: `- YYYY-MM-DD [area] gotcha → what to do`
 
 ## Entries
-
-<!--
-Template for each entry:
-
-### [date] — [short title]
-**Context:** where/when this comes up.
-**Gotcha:** the surprising thing or the error.
-**Resolution:** what to do about it.
--->
 
 _No entries yet._

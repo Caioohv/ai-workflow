@@ -13,7 +13,7 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 
 1. Read `workflow/definition.md` for project conventions, tech stack, and architecture. This is required context — if it is still the placeholder or missing, note that and proceed using the codebase itself.
 2. Read `workflow/project-memory.md` for known gotchas that may affect this task. Skim `workflow/decisions/` and follow the accepted ADRs relevant to this work (`adr-decisions`).
-3. Read the task file.
+3. Read the task file, then load the skills on its **Skills** line (Skill tool, or read their `SKILL.md`) and follow them. No line → load at most 3 available skills whose descriptions match the change.
 4. Move the task from `todo/` to `in-progress/` and update its **Status** field to `in-progress`.
 5. Implement everything described in the task:
    - Satisfy every acceptance criterion.
@@ -31,6 +31,7 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 
 - If you hit a genuine blocker (missing information, conflicting requirements, a design decision beyond your authority), stop and report it clearly. Do not guess at major design decisions.
 - Whenever user action is required (e.g., server access, database configuration, external secrets/tokens), always create an instruction file in `workflow/manual-tasks/` with clear steps for the user and notify them.
+- Never run a skill's interactive or setup flow (interviews, `init`): the product context is `workflow/definition.md` and the design system `workflow/design.md`. A listed skill that isn't available → continue without it and say so in the report.
 - Do not add features beyond what the task specifies.
 - Do not refactor code outside the task's scope.
 - Leave the codebase in a working, runnable state — no half-finished implementations.

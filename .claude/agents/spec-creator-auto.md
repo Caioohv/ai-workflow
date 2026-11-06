@@ -15,7 +15,7 @@ A brief description of the task — provided as an argument or in the first mess
 2. Read `workflow/project-memory.md` for known gotchas — factor any relevant ones into the spec (e.g. surface them in the Context section or acceptance criteria). Skim `workflow/decisions/` for accepted ADRs the spec must respect; if the task requires a new significant decision, record it per `adr-decisions`.
 3. List existing tasks across all `workflow/tasks/` subdirectories to avoid duplication and determine the next number.
 4. Make all reasonable assumptions needed to produce a complete spec. Document significant assumptions in the task's **Context** section.
-5. Write the task spec using `workflow/templates/task.md` as the template.
+5. Write the task spec using `workflow/templates/task.md` as the template. Fill its **Skills** line with `workflow/templates/skills-guide.md`.
 6. Choose a descriptive slug: lowercase, hyphenated.
 7. Determine the next sequence number by finding the highest `NN-` prefix across all task folders and incrementing by 1. Use zero-padded two digits (e.g., `01`, `02`, `12`).
 8. Save to `workflow/tasks/todo/NN-[slug].md` (e.g., `03-add-user-auth.md`).

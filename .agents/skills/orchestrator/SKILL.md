@@ -17,6 +17,7 @@ Optional. A question or goal (e.g. `how do I start?`, `I want to add login`, `wh
    - `workflow/todos/` — todo lists, and whether each was already expanded into steps.
    - `workflow/tasks/{todo,in-progress,to-review,done}/` — count and filenames.
    - `workflow/steps/{todo,in-progress,done}/` — count and filenames.
+   - `workflow/manual-tasks/` — which are still `pending` (grep the Status line, don't read whole files).
    - Ignore `.gitkeep`. If `workflow/` does not exist, the workflow is not installed: say so and point to `./setup.sh <target>`.
 2. Pick the recommendation with the "Decision order" below. If the user gave a goal, pick the pipeline with "Choosing a pipeline" and answer for that goal.
 3. Reply using the "Output format".
@@ -54,12 +55,13 @@ Support: `discover` defines the project once (`workflow/definition.md`); `design
 Recommend the first that applies:
 
 1. Project not defined → `<p>discover`.
-2. Something in `tasks/in-progress/` or `steps/in-progress/` → interrupted work: resume it with the matching implementer/executor on that file, or move it back to `todo/`.
-3. Tasks in `tasks/to-review/` → `<p>reviewer <path>` for the lowest-numbered one.
-4. Tasks in `tasks/todo/` → `<p>implementer-ci <path>` for one, or `<p>implementer-auto` for the whole queue.
-5. Steps in `steps/todo/` → `<p>executor <path>` for one, or `<p>executor-auto` for the whole queue.
-6. A todo list in `workflow/todos/` not yet expanded → `<p>define-steps-auto <path>`.
-7. Nothing pending → ask what they want to build and offer `<p>spec-creator <brief>` or `<p>todo-planner <description>`.
+2. Manual tasks still `pending` → list each one first (what, where, what it unblocks): the items they block can't move until the user does them.
+3. Something in `tasks/in-progress/` or `steps/in-progress/` → interrupted work: resume it with the matching implementer/executor on that file, or move it back to `todo/`.
+4. Tasks in `tasks/to-review/` → `<p>reviewer <path>` for the lowest-numbered one.
+5. Tasks in `tasks/todo/` → `<p>implementer-ci <path>` for one, or `<p>implementer-auto` for the whole queue.
+6. Steps in `steps/todo/` → `<p>executor <path>` for one, or `<p>executor-auto` for the whole queue.
+7. A todo list in `workflow/todos/` not yet expanded → `<p>define-steps-auto <path>`.
+8. Nothing pending → ask what they want to build and offer `<p>spec-creator <brief>` or `<p>todo-planner <description>`.
 
 If the goal involves UI and `workflow/design.md` is missing, put `<p>design-system` before any frontend work.
 

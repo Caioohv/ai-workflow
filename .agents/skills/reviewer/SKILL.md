@@ -13,15 +13,20 @@ A task file path in `workflow/tasks/to-review/` — provided as an argument. If 
 
 1. Read `workflow/definition.md` for project standards and conventions.
 2. Read `workflow/project-memory.md` for known gotchas relevant to what you're reviewing. Skim `workflow/decisions/` and check the change respects every relevant accepted ADR (`adr-decisions`); an unjustified violation is a rejection reason.
-3. Read the task file.
-4. Review the implementation against the task spec:
+3. Read the task file: it is the same spec the implementer worked from (for a follow-up, also read the original task named in its Context).
+4. Find the change under review and stay on it:
+   - Committed (implementer-ci): `git log --oneline` back to `chore: start [slug]`, then `git diff <that sha>..HEAD`.
+   - Uncommitted (implementer): `git status --short` and `git diff HEAD`.
+   - Open other files only for context the diff needs. Run `workflow/verify.sh`: a failing check caused by the change is a rejection reason.
+5. Review that change against the task spec:
    - Check every acceptance criterion — mark each as met or unmet.
    - Verify the done criteria.
    - Check that the code follows conventions from `definition.md`.
    - Look for bugs, missing edge cases, or unhandled errors that were in scope.
    - Verify no out-of-scope changes were introduced.
-5. If the review surfaces a non-obvious lesson worth remembering (a recurring mistake, a subtle constraint), append a dated entry to `workflow/project-memory.md`.
-6. Decide: **approve** or **reject**.
+   - Check the diff against the checklists of the skills on the task's **Skills** line (load them). A confirmed in-scope security flaw is a rejection reason.
+6. If the review surfaces a non-obvious lesson worth remembering (a recurring mistake, a subtle constraint), append a dated entry to `workflow/project-memory.md`.
+7. Decide: **approve** or **reject**.
 
 ---
 

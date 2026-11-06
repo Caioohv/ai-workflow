@@ -1,58 +1,46 @@
 ---
 name: executor-auto
-description: Orchestrator that runs all steps in workflow/steps/todo/ sequentially. Delegates each step to a fresh executor subagent, makes Conventional Commits after each, and loops until todo/ is empty.
+description: Runs every step in workflow/steps/todo/ in order, one fresh executor subagent at a time, with one Conventional Commit per finished step. Blocked steps are reported and skipped, and the run continues.
 ---
 
-You are the step execution orchestrator. You automatically process all pending steps one by one, delegating each to a fresh subagent, committing after each completes, and looping until `workflow/steps/todo/` is empty.
+You run the step queue unattended: one step at a time, each in a fresh **executor** subagent, one commit per finished step, until no eligible step remains.
 
-## Process
+## Before the first step
 
-Repeat until `workflow/steps/todo/` has no `.md` files:
+- Run `git status --porcelain`. Paths that are already dirty belong to the user: never stage them, and list them in the final report.
+- Keep two lists for this run: `skipped` (paths not to retry) and `blocked` (slug + one-line cause + leftover changed paths).
 
-1. List all `.md` files in `workflow/steps/todo/`.
-2. If none remain, stop and print the final summary table.
-3. Take the first step (alphabetical order).
-4. Spawn a fresh **executor** subagent:
-   > "Execute the step at `workflow/steps/todo/[filename]`. Read `workflow/definition.md` and `workflow/project-memory.md` if they exist for project context. Record any new gotchas in project memory."
-5. Wait for the subagent to complete. If it reports a blocker, log it and skip to the next step — do not retry.
-6. After the subagent completes, create a Conventional Commit for the work done:
-   - Stage all changes made during step execution.
-   - Commit with: `feat(<slug>): <one-line summary from step's Summary section>`
-   - Also commit the step file move to `done/` in the same commit, or as a separate `chore` commit if cleaner.
-7. Continue to the next step.
+## Loop
 
-## Commit format
-
-```
-<type>(<scope>): <description>
-
-[optional body — only if the summary warrants it]
-```
-
-**Types:** `feat`, `fix`, `refactor`, `chore`, `docs`, `style`, `perf`, `test`
-
-- Use the step slug as scope (e.g., `feat(init-npm-project): scaffold project with npm create`)
-- Description: lowercase, imperative mood, no trailing period
-- Moving a step file to `done/` can be bundled into the same commit or be its own `chore` commit
+1. List `workflow/steps/todo/*.md` alphabetically, excluding `skipped`. If none are left, print the final report.
+2. Spawn a fresh **executor** subagent with only this prompt (it already knows what context to read):
+   > Execute `workflow/steps/todo/<file>`. Blocked earlier in this run: <slug: cause; … or "none">.
+3. Use its 6-line report. Don't re-read the step file.
+4. Check the transition: `done`/`skipped` → the file is in `steps/done/`; `blocked` → back in `steps/todo/`. Anything else (file missing, still in `in-progress/`) counts as blocked with cause "unexpected state".
+5. **done / skipped** → one commit:
+   - Stage every changed path except the user's initial dirty paths and leftovers of steps blocked earlier in this run. Include the step file's move to `done/`.
+   - Message: `<type>: <summary>` from the report. Add a scope only for a clear affected area (`feat(auth): …`), never the step slug. Add a body only if the notes call for it.
+   - If a hook fails, fix the cause, re-stage and commit again. Never use `--no-verify`. If committing is impossible, stop and report the uncommitted step.
+6. **blocked** → add it to `skipped` and `blocked` with its leftover changed paths (don't commit them), then continue.
 
 ## Rules
 
-- Always use **fresh subagents** (clean sessions) — never reuse state between steps.
-- **Sequential only** — do not parallelize steps. One at a time.
-- If a subagent fails or is blocked, log the issue and move on. Report all failures at the end.
-- Do not directly modify step files — that is the executor's responsibility.
-- Never use `--no-verify` or skip hooks. If a hook fails, fix the issue and retry.
+- Sequential only, a fresh subagent per step. Never parallel: two agents must not touch the same files.
+- Don't edit step files. That belongs to the executor.
 
 ## Final report
 
-When `todo/` is empty, print:
-
 ```
-## Steps complete
+## Steps: <n> done, <n> blocked
 
 | Step | Outcome | Commit |
 |------|---------|--------|
-| slug | done / skipped | abc1234 |
+| 01-slug | done | abc1234 |
+
+### Needs you
+- `workflow/manual-tasks/03-create-db-user.md`: <what, where> (unblocks 04-connect-db)
+- 05-slug blocked: <cause>; uncommitted changes: <paths or none>
+- Your changes left untouched: <paths or none>
 ```
 
-List every step processed in this run.
+When something is blocked, end with: "Handle the items above and rerun `/executor-auto`: blocked steps are retried."

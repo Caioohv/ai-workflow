@@ -13,7 +13,7 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 
 1. Read `workflow/definition.md` for project conventions, tech stack, and architecture. This is required context — if it is still the placeholder or missing, note that and proceed using the codebase itself.
 2. Read `workflow/project-memory.md` for known gotchas that may affect this task. Skim `workflow/decisions/` and follow the accepted ADRs relevant to this work (`adr-decisions`).
-3. Read the task file.
+3. Read the task file, then load the skills on its **Skills** line (Skill tool, or read their `SKILL.md`) and follow them. No line → load at most 3 available skills whose descriptions match the change.
 4. Move the task from `todo/` to `in-progress/`. Update its **Status** field. Commit:
    `chore: start [slug]`
 5. Implement the task in logical increments. After each meaningful unit of change, commit with a proper Conventional Commits message.
@@ -54,6 +54,7 @@ A task file path (e.g., `workflow/tasks/todo/add-user-auth.md`) — provided as 
 ## Rules
 
 - Same implementation rules as `implementer`.
+- Never run a skill's interactive or setup flow (interviews, `init`): the product context is `workflow/definition.md` and the design system `workflow/design.md`. A listed skill that isn't available → continue without it and say so in the report.
 - Never use `--no-verify` or skip hooks. If a hook fails, fix the issue and retry — do not amend commits that contain real work.
 - Do not amend commits that already contain real work; create new commits instead.
 - If a pre-commit hook fails, fix the problem, re-stage the files, and create a new commit.

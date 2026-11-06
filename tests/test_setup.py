@@ -1,6 +1,7 @@
 """Installer checks using isolated temporary projects and no external dependencies."""
 
 from pathlib import Path
+import os
 import subprocess
 import tempfile
 import unittest
@@ -42,9 +43,70 @@ class SetupTests(unittest.TestCase):
             "workflow/steps/done", "workflow/todos", "workflow/decisions",
             "workflow/templates/adr.md", ".claude/skills/state-management/SKILL.md",
             ".agents/skills/state-management/SKILL.md", ".git",
+            "workflow/verify.sh", "workflow/.ai-workflow-manifest",
         ):
             self.assertTrue((self.target / name).exists(), name)
-        self.assertEqual((self.target / "AGENTS.md").read_text(), (REPO / "AGENTS.md").read_text())
+        for name in ("AGENTS.md", "CLAUDE.md", "GEMINI.md"):
+            self.assertEqual((self.target / name).read_text(), (REPO / name).read_text(), name)
+        self.assertTrue(os.access(self.target / "workflow/verify.sh", os.X_OK))
+
+    def test_fresh_install_appends_block_to_existing_instructions(self):
+        self.target.mkdir()
+        for name in ("CLAUDE.md", "GEMINI.md"):
+            (self.target / name).write_text("# Mine\nKeep this.\n")
+        self.run_setup()
+        for name in ("CLAUDE.md", "GEMINI.md"):
+            self.assertEqual((self.target / name).read_text(), "# Mine\nKeep this.\n" + (REPO / name).read_text())
+
+    def test_update_keeps_project_customizations(self):
+        self.run_setup()
+        custom = {
+            ".claude/agents/my-agent.md": "my agent\n",
+            ".claude/skills/my-skill/SKILL.md": "my skill\n",
+            ".agents/skills/my-skill/SKILL.md": "my shared skill\n",
+            ".agents/rules/team.md": "team rules\n",
+            ".claude/settings.json": '{"permissions": {"allow": ["Bash(npm run *)"]}}\n',
+            "workflow/templates/my-template.md": "mine\n",
+        }
+        for name, content in custom.items():
+            path = self.target / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content)
+        for name in ("CLAUDE.md", "GEMINI.md"):
+            path = self.target / name
+            path.write_text("Local notes\n" + path.read_text().replace("# ", "# Old ", 1))
+        (self.target / ".claude/agents/executor.md").write_text("stale")
+        self.run_setup("--update")
+        for name, content in custom.items():
+            self.assertEqual((self.target / name).read_text(), content, name)
+        for name in ("CLAUDE.md", "GEMINI.md"):
+            text = (self.target / name).read_text()
+            self.assertEqual(text, "Local notes\n" + (REPO / name).read_text(), name)
+            self.assertEqual(text.count(BEGIN), 1)
+        self.assertEqual(
+            (self.target / ".claude/agents/executor.md").read_text(),
+            (REPO / ".claude/agents/executor.md").read_text(),
+        )
+
+    def test_update_removes_only_files_dropped_from_framework(self):
+        self.run_setup()
+        manifest = self.target / "workflow/.ai-workflow-manifest"
+        outside = Path(self.workspace.name) / "outside.txt"
+        dropped = [".claude/agents/retired.md", ".agents/skills/retired/SKILL.md"]
+        unsafe = ["../outside.txt", "workflow/definition.md"]
+        for name in dropped:
+            (self.target / name).parent.mkdir(parents=True, exist_ok=True)
+            (self.target / name).write_text("old framework file")
+        outside.write_text("not ours")
+        with manifest.open("a") as stream:
+            stream.write("\n".join(dropped + unsafe) + "\n")
+        self.run_setup("--update")
+        for name in dropped:
+            self.assertFalse((self.target / name).exists(), name)
+        self.assertFalse((self.target / ".agents/skills/retired").exists())
+        self.assertEqual(outside.read_text(), "not ours")
+        self.assertTrue((self.target / "workflow/definition.md").is_file())
+        self.assertNotIn("retired", manifest.read_text())
 
     def test_existing_project_rules_survive_setup_and_update(self):
         self.target.mkdir()
@@ -107,7 +169,7 @@ class SetupTests(unittest.TestCase):
                 agents.write_text(content)
                 self.run_setup(success=False)
                 self.assertEqual(agents.read_text(), content)
-                self.assertEqual(list(self.target.glob(".ai-workflow-agents.*")), [])
+                self.assertEqual(list(self.target.iterdir()), [agents])
 
     def test_self_update_is_rejected_before_mutation(self):
         before = (REPO / "setup.sh").read_bytes()

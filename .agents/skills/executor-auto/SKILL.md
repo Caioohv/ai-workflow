@@ -3,24 +3,25 @@ name: executor-auto
 description: Process pending steps sequentially with executor and Conventional Commits. Use fresh subagents when available, otherwise execute the skill in the current session. Report blocked items without retrying them during the run.
 ---
 
-You are the step execution orchestrator. You automatically process all pending steps one by one, delegating each to a fresh subagent, committing after each completes, and looping until `workflow/steps/todo/` is empty.
+You run the step queue unattended: one step at a time, each in a fresh executor worker, one commit per finished step, until no eligible step remains.
 
-## Process
+## Before the first step
 
-Keep a set of step paths skipped during this run. Repeat until
-`workflow/steps/todo/` has no eligible `.md` files (excluding skipped paths):
+- Run `git status --porcelain`. Paths that are already dirty belong to the user: never stage them, and list them in the final report.
+- Keep two lists for this run: `skipped` (paths not to retry) and `blocked` (slug + one-line cause + leftover changed paths).
 
-1. List all eligible `.md` files in `workflow/steps/todo/`.
-2. If none remain, stop and print the final summary table, including remaining blockers.
-3. Take the first step (alphabetical order).
-4. Spawn a fresh **executor** subagent:
-   > "Read and follow `.agents/skills/executor/SKILL.md` to execute the step at `workflow/steps/todo/[filename]`. Read `workflow/definition.md` and `workflow/project-memory.md` if they exist for project context. Record any new gotchas in project memory."
-5. Wait for completion and verify the step moved to `done/` with a summary. If blocked, failed, or the transition is missing, record the path as skipped and continue without committing it.
-6. After the subagent completes, create a Conventional Commit for the work done:
-   - Apply `.agents/skills/commit-pr-conventions/SKILL.md` and stage only changes belonging to this step, preserving unrelated local changes.
-   - Commit with: `feat(<slug>): <one-line summary from step's Summary section>`
-   - Also commit the step file move to `done/` in the same commit, or as a separate `chore` commit if cleaner.
-7. If committing fails, stop and report the completed but uncommitted step before starting more work. Otherwise, select the next eligible step from the current queue.
+## Loop
+
+1. List `workflow/steps/todo/*.md` alphabetically, excluding `skipped`. If none are left, print the final report.
+2. Start a fresh executor worker with only this prompt:
+   > Read and follow `.agents/skills/executor/SKILL.md` to execute `workflow/steps/todo/<file>`. Blocked earlier in this run: <slug: cause; … or "none">.
+3. Use its 6-line report. Don't re-read the step file.
+4. Check the transition: `done`/`skipped` → the file is in `steps/done/`; `blocked` → back in `steps/todo/`. Anything else (file missing, still in `in-progress/`) counts as blocked with cause "unexpected state".
+5. **done / skipped** → one commit:
+   - Stage every changed path except the user's initial dirty paths and leftovers of steps blocked earlier in this run. Include the step file's move to `done/`.
+   - Message: `<type>: <summary>` from the report. Add a scope only for a clear affected area (`feat(auth): …`), never the step slug. Add a body only if the notes call for it.
+   - If a hook fails, fix the cause, re-stage and commit again. Never use `--no-verify`. If committing is impossible, stop and report the uncommitted step.
+6. **blocked** → add it to `skipped` and `blocked` with its leftover changed paths (don't commit them), then continue.
 
 ## Harness compatibility
 
@@ -32,38 +33,24 @@ If subagent tools are unavailable, read and execute the executor skill directly
 for each step and report that execution used the same session. Do not launch
 nested CLI sessions to bypass the current harness's permissions.
 
-## Commit format
-
-```
-<type>(<scope>): <description>
-
-[optional body — only if the summary warrants it]
-```
-
-**Types:** `feat`, `fix`, `refactor`, `chore`, `docs`, `style`, `perf`, `test`
-
-- Use the step slug as scope (e.g., `feat(init-npm-project): scaffold project with npm create`)
-- Description: lowercase, imperative mood, no trailing period
-- Moving a step file to `done/` can be bundled into the same commit or be its own `chore` commit
-
 ## Rules
 
-- When delegation is available, use **fresh subagents** for each step.
-- **Sequential only** — do not parallelize steps. One at a time.
-- If a subagent fails or is blocked, log the issue and move on. Report all failures at the end.
-- Step file changes belong to the executor skill, including when executing it directly because delegation is unavailable.
-- Never use `--no-verify` or skip hooks. If a hook fails, fix the issue and retry.
+- Sequential only, a fresh worker per step when delegation is available. Never parallel: two agents must not touch the same files.
+- Step file changes belong to the executor skill, including when you execute it directly because delegation is unavailable.
 
 ## Final report
 
-When no eligible steps remain, print (and list any remaining blockers):
-
 ```
-## Steps complete
+## Steps: <n> done, <n> blocked
 
 | Step | Outcome | Commit |
 |------|---------|--------|
-| slug | done / skipped | abc1234 |
+| 01-slug | done | abc1234 |
+
+### Needs you
+- `workflow/manual-tasks/03-create-db-user.md`: <what, where> (unblocks 04-connect-db)
+- 05-slug blocked: <cause>; uncommitted changes: <paths or none>
+- Your changes left untouched: <paths or none>
 ```
 
-List every step processed in this run.
+When something is blocked, end with: "Handle the items above and rerun the executor-auto skill: blocked steps are retried."

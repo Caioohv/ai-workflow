@@ -12,7 +12,7 @@ A path to a todo.md file (e.g., `@examples/todo.md` or `examples/todo.md`) — p
 ## Process
 
 1. Read the todo.md file provided.
-2. Read `workflow/definition.md` if it exists, for project context.
+2. Read `workflow/definition.md` if it exists, for project context, and `workflow/templates/skills-guide.md` to fill each step's **Skills** line.
 3. Review existing steps across all `workflow/steps/` subdirectories to determine the next number and avoid duplication.
 4. For each line in the todo.md, make all reasonable assumptions needed and write one step file following the format below.
 5. Determine the starting sequence number by finding the highest `NN-` prefix across all step folders and incrementing by 1. Use zero-padded two digits (e.g., `01`, `02`, `12`).
@@ -24,11 +24,15 @@ A path to a todo.md file (e.g., `@examples/todo.md` or `examples/todo.md`) — p
 ```markdown
 # [Short title]
 
-**Status:** todo
+**Skills:** [`skill-a`, `skill-b` chosen with `workflow/templates/skills-guide.md`, or `—`]
 
 ## What to do
 
 [2–4 sentences expanding the original todo line. Describe what needs to happen, what to create/change, and any obvious constraints. Do not over-specify — leave implementation judgment to the executor.]
+
+## Check
+
+[One line: the observable result that proves the step is done, e.g. a command and its expected output, a file that exists, a route that responds.]
 
 ## Original line
 
@@ -39,6 +43,9 @@ A path to a todo.md file (e.g., `@examples/todo.md` or `examples/todo.md`) — p
 
 - One step = one line from the todo.md. Never merge lines or split a single line across multiple steps unless it is unambiguously two distinct actions.
 - Keep "What to do" brief: 2–4 sentences max. This is a step, not a full task spec.
+- **Skills** follows the guide: only skills available in the session, at most 3, `—` for mechanical steps, `secure-coding` whenever the step handles input, auth, data access or secrets.
+- "Check" is one concrete, cheap verification the executor can run. No Status field: the folder is the status.
+- A line that needs something only the user can do (server access, credentials, a third-party account) says so in "What to do", so the executor prepares a manual task for it.
 - Do not invent technical decisions not grounded in `definition.md` or the todo line itself.
 - Choose slugs that reflect the action: lowercase, hyphenated (e.g., `init-npm-project`, `write-xyz-endpoint`).
 - If a todo line references an external file (like `xx.md`) that is not found, note it in the "What to do" section and proceed.

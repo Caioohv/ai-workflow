@@ -14,7 +14,8 @@ configuration for the other harnesses, not Codex agent registrations or rules.
   framework skill. Use `$design-system` when the design system needs defining.
 - Skim `workflow/decisions/` and follow accepted ADRs relevant to the work; record
   new significant technical decisions there with `adr-decisions`.
-- Load relevant technical skills as needed rather than reading every skill.
+- Load the skills named on the step's or task's **Skills** line (chosen with
+  `workflow/templates/skills-guide.md`); otherwise load only the relevant ones.
 - Record non-obvious solutions and gotchas in `workflow/project-memory.md`.
 
 ## Workflow entry points
@@ -40,11 +41,16 @@ Invoke a skill with `$skill-name` followed by its input, or ask for it by name.
 
 - Tasks: `workflow/tasks/todo/` → `in-progress/` → `to-review/` → `done/`.
   Rejection creates a follow-up task in `todo/`; review itself does not fix code.
-- Steps: `workflow/steps/todo/` → `in-progress/` → `done/`, with a summary appended.
+- Steps: `workflow/steps/todo/` → `in-progress/` → `done/`, with a summary appended;
+  a blocked step goes back to `todo/` with a `## Blocked` note and is retried next run.
 - Todo lists: `workflow/todos/NN-slug-todo.md`, a flat numbered list consumed by
   `define-steps`. Specs use zero-padded numbers and hyphenated slugs.
 - Use `workflow/templates/task.md` and `workflow/templates/design.md` where applicable.
-- Advance statuses only after completing the corresponding work and verification.
+- When the user must act (server, database, credentials, third-party services), write
+  `workflow/manual-tasks/NN-slug.md` from `workflow/templates/manual-task.md`: copy-paste
+  commands grouped by where to run them, real project values, a check, what it unblocks.
+- Advance statuses only after completing the corresponding work and verification
+  (`workflow/verify.sh` runs the existing lint, typecheck, test and build compactly).
   Report blockers and keep incomplete work out of `done/`.
 - Direct requests do not require creating a spec or step unless the user asks for
   that pipeline. Keep existing workflow state intact when changing harnesses.

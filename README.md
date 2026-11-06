@@ -18,9 +18,22 @@ todo → in-progress → to-review → done
 
 ```
 descrição → todo.md → steps/todo → steps/in-progress → steps/done (com resumo)
+                                         ↓ bloqueado
+                          volta para steps/todo com nota "Blocked"
 ```
 
-**Tarefas manuais (`workflow/manual-tasks/`)** — sempre que houver alguma ação que precise ser realizada pelo usuário (ex.: acessar servidor, configurar banco de dados, obter/configurar credenciais e chaves externas), os agentes criam um arquivo `.md` em `workflow/manual-tasks/` com orientações passo a passo claras para o usuário.
+Cada step tem uma linha `**Skills:**` com as skills que o executor deve carregar e uma
+seção `## Check` com a verificação objetiva. O `define-steps` escolhe as skills uma vez
+por lista, com `workflow/templates/skills-guide.md`: no máximo 3 por step, nenhuma em
+trabalho mecânico, `secure-coding` sempre que o step lida com entrada do usuário, auth,
+acesso a dados ou segredos, e `design-tools` em tudo que cria ou muda UI visível. Specs de task têm a mesma linha, usada pelo
+implementer e pelo reviewer. O executor roda
+`workflow/verify.sh` (lint, typecheck, test e build que existirem, uma linha por
+check e só o final do log das falhas) e devolve um relatório de 6 linhas, que o
+`executor-auto` transforma no commit. Um step que depende de você volta para
+`steps/todo/` com o motivo e é retomado na próxima execução do `executor-auto`.
+
+**Tarefas manuais (`workflow/manual-tasks/`)** — sempre que houver alguma ação que precise ser realizada pelo usuário (ex.: acessar servidor, configurar banco de dados, obter/configurar credenciais e chaves externas), os agentes criam um arquivo `.md` em `workflow/manual-tasks/` a partir de `workflow/templates/manual-task.md`. O arquivo diz onde fazer cada coisa (VPS via SSH, terminal local, painel do provedor), traz comandos prontos para copiar e colar com os valores reais do projeto, lista os valores que só você tem (senhas, IPs) e termina com um comando para conferir e o que ele desbloqueia. Ao terminar, mude o Status para `done` e rode de novo o `executor-auto`. O `orchestrator` lista as manual tasks pendentes antes de qualquer outra recomendação.
 
 **Decisões (`workflow/decisions/`)** — decisões técnicas significativas e difíceis de reverter (banco, ORM, estratégia de auth, estilo de API) viram ADRs curtos a partir de `workflow/templates/adr.md`. Os agentes leem os ADRs relevantes antes de especificar, implementar ou revisar, e o reviewer rejeita mudanças que violem um ADR aceito sem outro que o substitua.
 
@@ -53,13 +66,19 @@ Para atualizar um projeto existente:
 ```
 
 O setup instala os três harnesses. A atualização também adiciona suporte ao Codex
-em projetos que já usam Claude Code ou Antigravity. O conteúdo de `workflow/`
-é preservado, exceto os templates, que são atualizados junto com agentes, skills
-e regras do framework.
+em projetos que já usam Claude Code ou Antigravity. O estado em `workflow/` é
+preservado; só os templates e o `workflow/verify.sh` são atualizados, junto com
+agentes, skills e regras do framework.
 
-O instalador mantém as instruções locais de `AGENTS.md` e atualiza apenas o bloco
-entre `<!-- ai-workflow:begin -->` e `<!-- ai-workflow:end -->`. Coloque suas regras
-do projeto fora desse bloco. Esses marcadores são reservados ao setup.
+Em `AGENTS.md`, `CLAUDE.md` e `GEMINI.md`, o instalador atualiza apenas o bloco entre
+`<!-- ai-workflow:begin -->` e `<!-- ai-workflow:end -->`, no fim do arquivo, e mantém
+o resto. Coloque suas regras do projeto fora desse bloco. Esses marcadores são
+reservados ao setup.
+
+Agentes, skills e regras criados no próprio projeto não são tocados, e um
+`.claude/settings.json` existente é mantido. O setup registra em
+`workflow/.ai-workflow-manifest` os arquivos que instalou; no `--update`, remove só
+os que saíram do framework.
 
 ## Usando com Codex
 
@@ -130,8 +149,8 @@ e lista as alternativas. É somente leitura: orienta, mas não executa outros ag
 | `todo-planner` | `/todo-planner <descrição>` | Transforma uma descrição livre em um `todo.md` de passos pequenos, executáveis e verificáveis (alimenta o `define-steps`) |
 | `define-steps` | `/define-steps <todo.md>` | Expande um todo.md em step specs, pode fazer perguntas |
 | `define-steps-auto` | `/define-steps-auto <todo.md>` | Expande um todo.md em step specs sem perguntar nada |
-| `executor` | `/executor <step>` | Executa um step e registra resumo ao finalizar |
-| `executor-auto` | `/executor-auto` | Roda todos os steps pendentes com Conventional Commits |
+| `executor` | `/executor <step>` | Executa um step, verifica com `workflow/verify.sh` e move para `done/` com resumo, ou de volta para `todo/` com nota "Blocked" |
+| `executor-auto` | `/executor-auto` | Roda os steps pendentes em sequência, um subagente novo por step e um Conventional Commit por step concluído; lista no fim o que precisa de você |
 
 ## Skills
 
@@ -159,6 +178,7 @@ Skills entram em ação automaticamente quando você mexe no código relacionado
 
 | Skill | Quando aplica |
 |-------|---------------|
+| `design-tools` | Ao criar, ajustar ou revisar UI visível: modo da tela (app, landing, docs), hierarquia, tipografia, cor, movimento, estados e copy, com uma lista de vícios de template a recusar e verificação na tela renderizada. Inspirada nas ideias do [impeccable](https://github.com/pbakaus/impeccable) e do [taste-skill](https://github.com/leonxlnx/taste-skill), em versão enxuta, sem entrevista nem dependências |
 | `frontend-components` | Ao criar ou alterar UI — reaproveitamento de componentes e adesão aos tokens de `workflow/design.md` (nada hardcoded) |
 | `vue-atomic-design` | Ao compor componentes Vue 3 (SFC, `<script setup>`) com Atomic Design |
 | `react-atomic-design` | Ao compor componentes React (`.jsx`/`.tsx`) com Atomic Design |
@@ -187,7 +207,14 @@ A descrição de cada skill fica no contexto o tempo todo, inclusive em cada sub
 - descrições curtas (até 350 caracteres), só com o que a skill faz e os gatilhos; as fronteiras com outras skills ficam na seção "Out of scope" do corpo;
 - o corpo traz regras, escolhas padrão do projeto e checklist, não teoria que o modelo já conhece;
 - `CLAUDE.md`, `GEMINI.md` e `.agents/rules/rules.md` são curtos e não repetem as tabelas deste README;
-- `.claude/skills/` e `.agents/skills/` têm conteúdo idêntico.
+- `.claude/skills/` e `.agents/skills/` têm conteúdo idêntico, e os agentes de `.claude/agents/` têm o mesmo corpo das skills de pipeline, salvo as que mudam de propósito por harness.
+
+No pipeline de steps, onde cada step abre um subagente novo:
+
+- o status é a pasta, sem campo `Status` para editar a cada movimento;
+- `workflow/verify.sh` roda todos os checks em uma chamada e mostra só o resumo e o final das falhas;
+- o executor responde em 6 linhas fixas, e o `executor-auto` faz o commit sem reler o step;
+- o `project-memory.md` tem uma linha por entrada, com limite de ~60 entradas, porque todo agente o lê.
 
 Os testes em `tests/test_skills.py` garantem essas regras.
 
@@ -230,7 +257,8 @@ Os testes em `tests/test_skills.py` garantem essas regras.
 
 ## Verificar o instalador
 
-Os testes usam projetos temporários e exigem Python 3 e Git:
+Os testes usam projetos temporários e exigem Python 3 e Git (os de `verify.sh` também
+usam Node e npm e são pulados sem eles):
 
 ```bash
 bash -n setup.sh

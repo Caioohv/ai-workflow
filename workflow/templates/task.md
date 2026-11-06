@@ -3,6 +3,7 @@
 **Slug:** `slug-here`
 **Status:** `todo` | `in-progress` | `to-review` | `done`
 **Created:** YYYY-MM-DD
+**Skills:** [`skill-a`, `skill-b` chosen with `workflow/templates/skills-guide.md`, or `—`]
 
 ---
 

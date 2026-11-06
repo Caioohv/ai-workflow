@@ -7,9 +7,15 @@ import unittest
 
 REPO = Path(__file__).resolve().parents[1]
 CLAUDE_SKILLS = REPO / ".claude/skills"
+CLAUDE_AGENTS = REPO / ".claude/agents"
 SHARED_SKILLS = REPO / ".agents/skills"
 MAX_DESCRIPTION = 350
 MAX_ALWAYS_LOADED = 4000
+# Pipeline agents whose shared skill differs on purpose (invocation prefix, delegation).
+HARNESS_SPECIFIC = {"executor-auto", "implementer-auto", "orchestrator", "todo-planner"}
+CLAUDE_ONLY = {"security-scan"}
+SKILLS_GUIDE = REPO / "workflow/templates/skills-guide.md"
+NOT_PLANNED = {"commit-pr-conventions"}  # used by whoever commits, never chosen per step or task
 
 
 def frontmatter(path):
@@ -29,6 +35,10 @@ def frontmatter(path):
     return fields
 
 
+def body(path):
+    return re.sub(r"\A---\n.*?\n---\n", "", path.read_text(), count=1, flags=re.S)
+
+
 class SkillTests(unittest.TestCase):
     def test_technical_skills_are_mirrored(self):
         for skill in sorted(CLAUDE_SKILLS.iterdir()):
@@ -44,6 +54,29 @@ class SkillTests(unittest.TestCase):
                 description = fields.get("description", "")
                 self.assertTrue(description)
                 self.assertLessEqual(len(description), MAX_DESCRIPTION)
+
+    def test_pipeline_agents_match_shared_skills(self):
+        for agent in sorted(CLAUDE_AGENTS.glob("*.md")):
+            name = agent.stem
+            with self.subTest(agent=name):
+                self.assertLessEqual(len(frontmatter(agent).get("description", "")), MAX_DESCRIPTION)
+                if name in CLAUDE_ONLY:
+                    continue
+                shared = SHARED_SKILLS / name / "SKILL.md"
+                self.assertTrue(shared.is_file(), name)
+                if name not in HARNESS_SPECIFIC:
+                    self.assertEqual(body(agent), body(shared), name)
+
+    def test_skills_guide_names_existing_skills(self):
+        table = SKILLS_GUIDE.read_text().split("## By kind of change", 1)[1]
+        named = set(re.findall(r"`([a-z0-9-]+)`", table))
+        self.assertTrue(named)
+        for name in sorted(named):
+            with self.subTest(skill=name):
+                self.assertTrue((CLAUDE_SKILLS / name / "SKILL.md").is_file())
+                self.assertTrue((SHARED_SKILLS / name / "SKILL.md").is_file())
+        covered = {path.name for path in CLAUDE_SKILLS.iterdir()}
+        self.assertEqual(covered - named - NOT_PLANNED, set(), "skills missing from the guide")
 
     def test_always_loaded_instructions_stay_small(self):
         for name in ("CLAUDE.md", "GEMINI.md", ".agents/rules/rules.md"):
